@@ -28,9 +28,9 @@ function makeValidator<T>(errorMsg: string, fn: (value: T) => boolean): Validato
 
 type Preprocessor<I = any, O = any> = (value: I) => O;
 
-// const intrinsicPreprocessors: Partial<Record<Types, Preprocessor>> = {
-//     // string: s => typeof s !== 'undefined' ? String(s) : undefined
-// }
+const intrinsicPreProcessors: Partial<Record<Types, Preprocessor>> = {
+    string: s => typeof s === 'number' ? String(s) : s
+}
 
 const intrinsicValidators: Partial<Record<Types, BooleanValidator<any>>> = {
     number: n => n * 1 === n,
@@ -64,6 +64,10 @@ class Option<T extends Types, R extends boolean, A extends boolean> {
                 throw new Error(`expected <${type}>, but received <${typeof value}>`);
             });
         }
+        const intrinsicPreProcessor = intrinsicPreProcessors[type];
+        if (intrinsicPreProcessor) {
+            this.process('pre', intrinsicPreProcessor as Preprocessor);
+        }
     }
 
     alias(...aliases: string[]) {
@@ -89,6 +93,7 @@ class Option<T extends Types, R extends boolean, A extends boolean> {
     default(value: ResolveType<T>) {
         this.defaultValue = value;
         this.isRequired = false;
+        this.process('post', v => v === undefined ? value : v);
         return this as any as Option<T, true, A>;
     }
 
@@ -336,11 +341,17 @@ function objMap<T, R>(obj: Record<string, T>, fn: (item: T) => R): Record<string
 }
 
 function parse<D extends CliDeclaration>(decl: D, argv: string[]): ResolveCliDeclaration<D> {
+    const res: ResolveCliDeclaration<D> = {
+        _: undefined as any,
+        options: {} as any
+    };
+
     const usedKeys = prepareCliDeclaration(decl);
     const parsed = yargsParser(argv, {
         alias: decl.options && objMap(decl.options, item => item.__getData().aliases)
     });
     const {report, data} = handleAllOptions(decl.options || {}, extractOptionsFromYargs(parsed), usedKeys);
+    res.options = data;
     printReport(report);
     if (decl._) {
         const parsedArgs = (!decl._.__getData().isArray && parsed._.length === 1) ? parsed._[0] : parsed._;
@@ -349,12 +360,12 @@ function parse<D extends CliDeclaration>(decl: D, argv: string[]): ResolveCliDec
             printArgumentError(errors);
             throw new Error('\nProvided arguments are NOT valid');
         }
-        data._ = value;
+        res._ = value;
     }
     if (!report.isValid) {
         throw new Error('\nProvided options are NOT valid');
     }
-    return data;
+    return res;
 }
 
 function cli<D extends CliDeclaration>(decl: D): ResolveCliDeclaration<D> {
@@ -384,7 +395,7 @@ const data = cli({
 })
 
 console.log('Ok');
-console.log(data.options);
+console.log(data);
 
 // cli.
 

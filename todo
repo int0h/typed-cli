@@ -1,2 +1,4 @@
 - generate --help
 - postProcess typing
+- tests
+- fix string validation for number-like strings
