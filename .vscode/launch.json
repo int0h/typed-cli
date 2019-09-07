@@ -12,7 +12,7 @@
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ],
-            "args": ["-p"]
+            "args": ["-p", "asd", "ads", "asd"]
         }
     ]
 }

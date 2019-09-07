@@ -39,9 +39,7 @@ const intrinsicValidators: Partial<Record<Types, BooleanValidator<any>>> = {
     boolean: b => typeof b === 'boolean'
 }
 
-const requiredValidator: Validator<any> = val => typeof val !== 'undefined';
-
-class Option<T extends Types, R extends boolean, A extends boolean = false> {
+class Option<T extends Types, R extends boolean, A extends boolean> {
     private type: Types;
     private description: string = '';
     private isRequired: boolean = false;
@@ -80,18 +78,18 @@ class Option<T extends Types, R extends boolean, A extends boolean = false> {
 
     required() {
         this.isRequired = true;
-        return this as any as Option<T, true>;
+        return this as any as Option<T, true, A>;
     }
 
     array() {
         this.isArray = true;
-        return this;
+        return this as any as Option<T, R, true>;
     }
 
     default(value: ResolveType<T>) {
         this.defaultValue = value;
         this.isRequired = false;
-        return this as any as Option<T, true>;
+        return this as any as Option<T, true, A>;
     }
 
     validate(errorMsg: string, validator: BooleanValidator<T>): Option<T, R, A>;
@@ -179,7 +177,18 @@ function runPreprocessors(phase: 'pre' | 'post', optCfg: Option<any, any, any>, 
     return value;
 }
 
-function handleOption(optCfg: Option<any, any, any>, value: any): {value: any, errors: string[]} {
+function handleOption(optCfg: Option<any, any, any>, value: any, iterating?: boolean): {value: any, errors: string[]} {
+    if (optCfg.__getData().isArray && !iterating) {
+        const arrValue = ([] as any[]).concat(value);
+        let errorsArr: string[] = [];
+        let valueArr: string[] = [];
+        arrValue.forEach(v => {
+            const res = handleOption(optCfg, v, true);
+            errorsArr = errorsArr.concat(res.errors);
+            valueArr = valueArr.concat(res.value);
+        });
+        return {errors: errorsArr, value: valueArr};
+    }
     value = runPreprocessors('pre', optCfg, value);
     const errors = validateOption(optCfg, value);
     value = runPreprocessors('post', optCfg, value);
@@ -210,6 +219,17 @@ function handleAllOptions(optSchema: OptionSet, rawData: Record<string, any>, us
     return {data, report};
 }
 
+function printOptionError(title: string, errors: string[]) {
+    console.error(title);
+    for (const err of errors) {
+        console.error(`\t ${chalk.red('>')} ` + err);
+    }
+}
+
+function printArgumentError(errors: string[]) {
+    printOptionError(`❌  ` + chalk.redBright(`arguments are invalid`), errors);
+}
+
 function printReport(report: ValidationReport) {
     for (const warn of report.warnings) {
         console.warn('⚠️  ' + chalk.yellow(warn));
@@ -218,14 +238,11 @@ function printReport(report: ValidationReport) {
         if (item.errors.length === 0) {
             continue;
         }
-        console.error(`❌  ` + chalk.redBright(`option " ${key} " is invalid`));
-        for (const err of item.errors) {
-            console.error(`\t ${chalk.red('>')} ` + err);
-        }
+        printOptionError(`❌  ` + chalk.redBright(`option " ${key} " is invalid`), item.errors);
     }
 }
 
-type OptionSet = Record<string, Option<any, boolean>>;
+type OptionSet = Record<string, Option<any, boolean, boolean>>;
 
 export type GetPropertiyNames<T extends Object, P> = {
     [K in keyof T]: T[K] extends P ? K : never;
@@ -233,8 +250,8 @@ export type GetPropertiyNames<T extends Object, P> = {
 
 export type GetProperties<T extends Object, P> = Pick<T, GetPropertiyNames<T, P>>;
 
-type PickRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, true>>;
-type PickNonRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, false>>;
+type PickRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, true, boolean> | Option<any, boolean, true>>;
+type PickNonRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, false, boolean>>;
 
 type ResolveOptionType<O extends Option<Types, boolean, boolean>> = O extends Option<infer T, boolean, boolean>
     ? ResolveType<T>
@@ -260,7 +277,11 @@ const aliasStorage = new WeakMap<any, Set<string>[]>();
 
 type ResolveCliDeclaration<D extends CliDeclaration> = {
     options: D['options'] extends OptionSet ? ResolveOptionSet<D['options']> : {};
-    _: D['options'] extends OptionSet ? ResolveOptionSet<D['options']> : {};
+    _: D['_'] extends Option<any, infer R, any>
+        ? R extends true
+            ? ResolveOption<D['_']>
+            : ResolveOption<D['_']> | undefined
+        : undefined;
 }
 
 function createKebabAlias(str: string): string | undefined {
@@ -321,8 +342,17 @@ function parse<D extends CliDeclaration>(decl: D, argv: string[]): ResolveCliDec
     });
     const {report, data} = handleAllOptions(decl.options || {}, extractOptionsFromYargs(parsed), usedKeys);
     printReport(report);
+    if (decl._) {
+        const parsedArgs = (!decl._.__getData().isArray && parsed._.length === 1) ? parsed._[0] : parsed._;
+        const {value, errors} = handleOption(decl._, parsedArgs);
+        if (errors.length > 0) {
+            printArgumentError(errors);
+            throw new Error('\nProvided arguments are NOT valid');
+        }
+        data._ = value;
+    }
     if (!report.isValid) {
-        throw new Error('\nProvided arguments are NOT valid');
+        throw new Error('\nProvided options are NOT valid');
     }
     return data;
 }
@@ -340,21 +370,21 @@ function cli<D extends CliDeclaration>(decl: D): ResolveCliDeclaration<D> {
 // declareCli.foo = 13;
 
 function option<T extends Types>(type: T) {
-    return new Option<T, false>(type);
+    return new Option<T, false, false>(type);
 }
 
 const data = cli({
     description: `Blah blah`,
     options: {
-        taskerFilePath: option('int').required().alias('p').desc('a path to a task file'),
+        taskerFilePath: option('int').array().required().alias('p').desc('a path to a task file'),
         cleanLogs: option('boolean').default(false).alias('c').desc('cleans logs before start'),
         logsPath: option('string').alias('l').desc('cleans logs before start')
     },
-    _: option('string')
+    _: option('number').required().array()
 })
 
 console.log('Ok');
-console.log(data);
+console.log(data.options);
 
 // cli.
 
