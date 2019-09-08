@@ -69,7 +69,7 @@ function generateOptionDescription(config: CliDeclaration, decorator: HelpDecora
         lineParts.push(decorator(aliases, 'alias'));
 
         // type
-        lineParts.push(decorator(`<${optData.type}>`, 'type'));
+        lineParts.push(decorator(`<${optData.labelName}>`, 'type'));
 
         // optionality
         if (optData.isArray) {
@@ -106,7 +106,7 @@ function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaul
             const optionStrings: string[] = [];
 
             const [boolean, rest] = arrayPartition(opts, (opt) => {
-                return opt.__getData().type === 'boolean' && findMinialAlias(opt).length === 1;
+                return opt.__getData().labelName === 'boolean' && findMinialAlias(opt).length === 1;
             });
 
             const booleanGroup = boolean.map(opt => findMinialAlias(opt)).join('');
@@ -115,9 +115,9 @@ function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaul
             rest.forEach(opt => {
                 const alias = findMinialAlias(opt);
                 const prefix = alias.length === 1 ? '-' : '--';
-                const value = opt.__getData().type === 'boolean'
+                const value = opt.__getData().labelName === 'boolean'
                     ? ''
-                    : ' ' + decorator(`<${opt.__getData().type}>`, 'type');
+                    : ' ' + decorator(`<${opt.__getData().labelName}>`, 'type');
                 optionStrings.push(decorator(prefix + alias, 'usage-option') + value);
             });
 
@@ -128,7 +128,7 @@ function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaul
     let argText: string | undefined = undefined;
     if (config._) {
         const arg = config._.__getData();
-        const argType = decorator(`<${arg.type}>`, 'type');
+        const argType = decorator(`<${arg.labelName}>`, 'type');
         if (arg.isArray) {
             argText = `[${argType} ${argType} ...]`;
         } else if (!arg.isRequired) {

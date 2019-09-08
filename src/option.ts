@@ -27,6 +27,7 @@ const intrinsicValidators: Partial<Record<Types, BooleanValidator<any>>> = {
 export class Option<T extends Types, R extends boolean, A extends boolean> {
     name: string = '';
     private type: Types;
+    private labelName: string;
     private description: string = '';
     private isRequired: boolean = false;
     private aliases: string[] = [];
@@ -41,19 +42,25 @@ export class Option<T extends Types, R extends boolean, A extends boolean> {
 
     constructor(type: T) {
         this.type = type;
+        this.labelName = type;
         const intrinsicValidator = intrinsicValidators[type];
         if (intrinsicValidator) {
             this.validate(value => {
                 if (intrinsicValidator(value)) {
                     return;
                 }
-                throw new Error(`expected <${type}>, but received <${typeof value}>`);
+                throw new Error(`expected <${this.labelName}>, but received <${typeof value}>`);
             });
         }
         const intrinsicPreProcessor = intrinsicPreProcessors[type];
         if (intrinsicPreProcessor) {
             this.process('pre', intrinsicPreProcessor as Preprocessor);
         }
+    }
+
+    label(name: string) {
+        this.labelName = name;
+        return this;
     }
 
     alias(...aliases: string[]) {
@@ -117,6 +124,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean> {
             validators: this.validators,
             prePreprocessors: this.prePreprocessors,
             postPreprocessors: this.postPreprocessors,
+            labelName: this.labelName
         }
     }
 }
