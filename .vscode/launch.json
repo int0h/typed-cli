@@ -8,11 +8,11 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/index.js",
+            "program": "${workspaceFolder}/pg/index.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ],
-            "args": ["-p", "asd", "ads", "asd"]
+            "args": ["-p", "asd", "ads", "asd", "--help"]
         }
     ]
 }

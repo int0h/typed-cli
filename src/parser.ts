@@ -3,7 +3,7 @@ import yargsParser from 'yargs-parser';
 import {Option, OptionSet, Types} from './option';
 import {CliDeclaration, ResolveCliDeclaration} from './type-logic';
 import {handleAllOptions, handleOption} from './pipeline';
-import {printReport, printArgumentError} from './printer';
+import {printReport, printArgumentError, generateHelp, fancyHelpDecorator} from './printer';
 import {createKebabAlias, objMap} from './utils';
 
 function checkAliasCollisions(opts: OptionSet) {
@@ -28,6 +28,7 @@ function prepareCliDeclaration(decl: CliDeclaration) {
     const {options = {}, _ = option('any')} = decl;
     for (const [name, opt] of Object.entries(options)) {
         const alias = createKebabAlias(name);
+        opt.name = name;
         if (alias) {
             opt.alias(alias);
         }
@@ -42,8 +43,9 @@ function extractOptionsFromYargs(data: any) {
     return copyData;
 }
 
-export function config<D extends CliDeclaration>(decl: D): {
+export function configure<D extends CliDeclaration>(decl: D): {
     parse: (argv: string[] | string) => ResolveCliDeclaration<D>;
+    generateHelp: () => string;
 } {
     const usedKeys = prepareCliDeclaration(decl);
     const optCfg = objMap(decl.options || {}, item => item.__getData());
@@ -74,12 +76,20 @@ export function config<D extends CliDeclaration>(decl: D): {
         return res;
     }
 
-    return {parse};
+    return {
+        parse,
+        generateHelp: () => generateHelp(decl, fancyHelpDecorator)
+    };
 }
 
 export function cli<D extends CliDeclaration>(decl: D): ResolveCliDeclaration<D> {
     try {
-        return config(decl).parse(process.argv.slice(2));
+        const {generateHelp, parse} = configure(decl);
+        if (process.argv.includes('--help')) {
+            console.log(generateHelp());
+            process.exit(0);
+        }
+        return parse(process.argv.slice(2));
     } catch(e) {
         console.error(e.message);
         process.exit(1);

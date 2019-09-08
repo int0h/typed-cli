@@ -24,12 +24,11 @@ type ResolveOptionSet<O extends OptionSet> = {
 }
 
 export type CliDeclaration = {
+    command?: string;
     options?: OptionSet;
     description?: string;
     _?: Option<Types, boolean, boolean>;
 }
-
-const aliasStorage = new WeakMap<any, Set<string>[]>();
 
 export type ResolveCliDeclaration<D extends CliDeclaration> = {
     options: D['options'] extends OptionSet ? ResolveOptionSet<D['options']> : {};

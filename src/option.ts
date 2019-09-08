@@ -25,6 +25,7 @@ const intrinsicValidators: Partial<Record<Types, BooleanValidator<any>>> = {
 }
 
 export class Option<T extends Types, R extends boolean, A extends boolean> {
+    name: string = '';
     private type: Types;
     private description: string = '';
     private isRequired: boolean = false;

@@ -12,3 +12,20 @@ export function objMap<T, R>(obj: Record<string, T>, fn: (item: T) => R): Record
     }
     return res;
 }
+
+export function alignTextMatrix(textMatrix: string[][]) {
+    const colSizes: number[] = [];
+    textMatrix.forEach(line => {
+        line.forEach((text, index) => colSizes[index] = Math.max(colSizes[index] || 0, text.length));
+    });
+    return textMatrix.map(line => {
+        return line.map((text, index) => text.padEnd(colSizes[index], ' '));
+    });
+}
+
+export function arrayPartition<T>(array: T[], fn: (item: T, index: number, array: T[]) => boolean): [T[], T[]] {
+    return [
+        array.filter((item, index, array) => fn(item, index, array)),
+        array.filter((item, index, array) => !fn(item, index, array))
+    ];
+}
