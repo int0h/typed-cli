@@ -28,7 +28,9 @@ export function printReport(report: ValidationReport) {
     }
 }
 
-export type HelpDecorator = (text: string, ctx: 'alias' | 'type' | 'optionality' | 'option-description' | 'title') => string;
+type DecoratorCtx = 'alias' | 'type' | 'optionality' | 'option-description' | 'title' | 'usage-option' | 'command';
+
+export type HelpDecorator = (text: string, ctx: DecoratorCtx) => string;
 
 export const defaultHelpDecorator = (str: string) => str;
 
@@ -38,6 +40,8 @@ export const fancyHelpDecorator: HelpDecorator = (str, ctx) => {
         case 'optionality': return chalk.yellow(str);
         case 'option-description': return chalk.dim(str);
         case 'title': return chalk.underline(str);
+        case 'usage-option': return chalk.italic(str);
+        case 'command': return chalk.bold(str);
         default: return str;
     }
 }
@@ -106,7 +110,7 @@ function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaul
             });
 
             const booleanGroup = boolean.map(opt => findMinialAlias(opt)).join('');
-            booleanGroup.length > 0 && optionStrings.push('-' + booleanGroup);
+            booleanGroup.length > 0 && optionStrings.push(decorator('-' + booleanGroup, 'usage-option'));
 
             rest.forEach(opt => {
                 const alias = findMinialAlias(opt);
@@ -114,7 +118,7 @@ function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaul
                 const value = opt.__getData().type === 'boolean'
                     ? ''
                     : ' ' + decorator(`<${opt.__getData().type}>`, 'type');
-                optionStrings.push(prefix + alias + value);
+                optionStrings.push(decorator(prefix + alias, 'usage-option') + value);
             });
 
             return optionStrings.join(' ');
@@ -124,17 +128,18 @@ function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaul
     let argText: string | undefined = undefined;
     if (config._) {
         const arg = config._.__getData();
+        const argType = decorator(`<${arg.type}>`, 'type');
         if (arg.isArray) {
-            argText = `[<${arg.type}> <${arg.type}> ...]`;
+            argText = `[${argType} ${argType} ...]`;
         } else if (!arg.isRequired) {
-            argText = `[<${arg.type}>]`;
+            argText = `[${argType}]`;
         } else {
-            argText = `<${arg.type}>`;
+            argText = argType;
         }
     }
 
     return [
-        config.command,
+        config.command && decorator(config.command, 'command'),
         requiredOpts,
         optionalOpts.length > 0 && ('[' + optionalOpts + ']'),
         argText
