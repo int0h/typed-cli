@@ -1,6 +1,6 @@
 import yargsParser from 'yargs-parser';
 
-import {Option, OptionSet, Types} from './option';
+import {Option, OptionSet, Types, ResolveType, getOptData} from './option';
 import {CliDeclaration, ResolveCliDeclaration} from './type-logic';
 import {handleAllOptions, handleOption} from './pipeline';
 import {printReport, printArgumentError, generateHelp, fancyHelpDecorator} from './printer';
@@ -18,7 +18,7 @@ function checkAliasCollisions(opts: OptionSet) {
 
     for (const [name, opt] of Object.entries(opts)) {
         check(name);
-        opt.__getData().aliases.forEach(check);
+        getOptData(opt).aliases.forEach(check);
     }
 
     return usedKeys;
@@ -48,7 +48,7 @@ export function configure<D extends CliDeclaration>(decl: D): {
     generateHelp: () => string;
 } {
     const usedKeys = prepareCliDeclaration(decl);
-    const optCfg = objMap(decl.options || {}, item => item.__getData());
+    const optCfg = objMap(decl.options || {}, item => getOptData(item));
 
     function parse(argv: string[] | string) {
         const res: ResolveCliDeclaration<D> = {
@@ -56,14 +56,14 @@ export function configure<D extends CliDeclaration>(decl: D): {
             options: {} as any
         };
         const parsed = yargsParser(argv, {
-            alias: decl.options && objMap(decl.options, item => item.__getData().aliases)
+            alias: decl.options && objMap(decl.options, item => getOptData(item).aliases)
         });
         const {report, data} = handleAllOptions(optCfg, extractOptionsFromYargs(parsed), usedKeys);
         res.options = data;
         printReport(report);
         if (decl._) {
-            const parsedArgs = (!decl._.__getData().isArray && parsed._.length === 1) ? parsed._[0] : parsed._;
-            const {value, errors} = handleOption(decl._.__getData(), parsedArgs);
+            const parsedArgs = (!getOptData(decl._).isArray && parsed._.length === 1) ? parsed._[0] : parsed._;
+            const {value, errors} = handleOption(getOptData(decl._), parsedArgs);
             if (errors.length > 0) {
                 printArgumentError(errors);
                 throw new Error('\nProvided arguments are NOT valid');
@@ -98,5 +98,5 @@ export function cli<D extends CliDeclaration>(decl: D): ResolveCliDeclaration<D>
 }
 
 export function option<T extends Types>(type: T) {
-    return new Option<T, false, false>(type);
+    return new Option<T, false, false, ResolveType<T>>(type);
 }

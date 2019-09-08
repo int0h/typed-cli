@@ -6,14 +6,14 @@ export type GetPropertiyNames<T extends Object, P> = {
 
 export type GetProperties<T extends Object, P> = Pick<T, GetPropertiyNames<T, P>>;
 
-type PickRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, true, boolean> | Option<any, boolean, true>>;
-type PickNonRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, false, boolean>>;
+type PickRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, true, boolean, any> | Option<any, boolean, true, any>>;
+type PickNonRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, false, boolean, any>>;
 
-type ResolveOptionType<O extends Option<Types, boolean, boolean>> = O extends Option<infer T, boolean, boolean>
-    ? ResolveType<T>
+type ResolveOptionType<O extends Option<Types, boolean, boolean, any>> = O extends Option<any, boolean, boolean, infer R>
+    ? R
     : never;
 
-type ResolveOption<O extends Option<Types, boolean, boolean>> = O extends Option<Types, boolean, true>
+type ResolveOption<O extends Option<Types, boolean, boolean, any>> = O extends Option<Types, boolean, true, any>
     ? Array<ResolveOptionType<O>>
     : ResolveOptionType<O>;
 
@@ -27,12 +27,12 @@ export type CliDeclaration = {
     command?: string;
     options?: OptionSet;
     description?: string;
-    _?: Option<Types, boolean, boolean>;
+    _?: Option<Types, boolean, boolean, any>;
 }
 
 export type ResolveCliDeclaration<D extends CliDeclaration> = {
     options: D['options'] extends OptionSet ? ResolveOptionSet<D['options']> : {};
-    _: D['_'] extends Option<any, infer R, any>
+    _: D['_'] extends Option<any, infer R, any, any>
         ? R extends true
             ? ResolveOption<D['_']>
             : ResolveOption<D['_']> | undefined

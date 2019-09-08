@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import {ValidationReport} from './pipeline';
 import {CliDeclaration} from './type-logic';
 import {alignTextMatrix, arrayPartition} from './utils';
-import { Option } from './option';
+import { Option, getOptData } from './option';
 
 export function printOptionError(title: string, errors: string[]) {
     console.error(title);
@@ -28,7 +28,15 @@ export function printReport(report: ValidationReport) {
     }
 }
 
-type DecoratorCtx = 'alias' | 'type' | 'optionality' | 'option-description' | 'title' | 'usage-option' | 'command';
+type DecoratorCtx = 'alias'
+    | 'type'
+    | 'optionality'
+    | 'option-description'
+    | 'title'
+    | 'usage-option'
+    | 'command'
+    | 'optionality-required'
+    | 'optionality-multiple';
 
 export type HelpDecorator = (text: string, ctx: DecoratorCtx) => string;
 
@@ -38,6 +46,8 @@ export const fancyHelpDecorator: HelpDecorator = (str, ctx) => {
     switch (ctx) {
         case 'type': return chalk.green(str);
         case 'optionality': return chalk.yellow(str);
+        case 'optionality-required': return chalk.redBright(str);
+        case 'optionality-multiple': return chalk.cyan(str);
         case 'option-description': return chalk.dim(str);
         case 'title': return chalk.underline(str);
         case 'usage-option': return chalk.italic(str);
@@ -55,7 +65,7 @@ function generateOptionDescription(config: CliDeclaration, decorator: HelpDecora
     const optionTextMatrix: string[][] = [];
     for (const [name, optCgf] of Object.entries(options)) {
         const lineParts: string[] = [];
-        const optData = optCgf.__getData();
+        const optData = getOptData(optCgf);
 
         // aliases
         const aliases = [name, ...optData.aliases]
@@ -73,11 +83,13 @@ function generateOptionDescription(config: CliDeclaration, decorator: HelpDecora
 
         // optionality
         if (optData.isArray) {
-            lineParts.push(decorator('[multiple]', 'optionality'));
+            lineParts.push(decorator('[multiple]', 'optionality-multiple'));
         } else if (optData.defaultValue) {
             lineParts.push(decorator(`[=${optData.defaultValue}]`, 'optionality'))
         } else if (!optData.isRequired) {
             lineParts.push(decorator('[optional]', 'optionality'));
+        } else {
+            lineParts.push(decorator('[required]', 'optionality-required'));
         }
 
         // description
@@ -91,8 +103,8 @@ function generateOptionDescription(config: CliDeclaration, decorator: HelpDecora
         .join('\n');
 }
 
-function findMinialAlias(opt: Option<any, any, any>): string {
-    return [opt.name, ...opt.__getData().aliases].sort((a, b) => a.length - b.length)[0];
+function findMinialAlias(opt: Option<any, any, any, any>): string {
+    return [opt.name, ...getOptData(opt).aliases].sort((a, b) => a.length - b.length)[0];
 }
 
 function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaultHelpDecorator) {
@@ -100,13 +112,13 @@ function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaul
 
     // options:
     const [requiredOpts, optionalOpts] = arrayPartition(Object.values(options), (opt) => {
-        return opt.__getData().isRequired;
+        return getOptData(opt).isRequired;
     })
         .map(opts => {
             const optionStrings: string[] = [];
 
             const [boolean, rest] = arrayPartition(opts, (opt) => {
-                return opt.__getData().labelName === 'boolean' && findMinialAlias(opt).length === 1;
+                return getOptData(opt).labelName === 'boolean' && findMinialAlias(opt).length === 1;
             });
 
             const booleanGroup = boolean.map(opt => findMinialAlias(opt)).join('');
@@ -115,9 +127,9 @@ function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaul
             rest.forEach(opt => {
                 const alias = findMinialAlias(opt);
                 const prefix = alias.length === 1 ? '-' : '--';
-                const value = opt.__getData().labelName === 'boolean'
+                const value = getOptData(opt).labelName === 'boolean'
                     ? ''
-                    : ' ' + decorator(`<${opt.__getData().labelName}>`, 'type');
+                    : ' ' + decorator(`<${getOptData(opt).labelName}>`, 'type');
                 optionStrings.push(decorator(prefix + alias, 'usage-option') + value);
             });
 
@@ -127,7 +139,7 @@ function generateUsage(config: CliDeclaration, decorator: HelpDecorator = defaul
     // arguments:
     let argText: string | undefined = undefined;
     if (config._) {
-        const arg = config._.__getData();
+        const arg = getOptData(config._);
         const argType = decorator(`<${arg.labelName}>`, 'type');
         if (arg.isArray) {
             argText = `[${argType} ${argType} ...]`;

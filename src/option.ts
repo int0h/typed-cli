@@ -24,109 +24,156 @@ const intrinsicValidators: Partial<Record<Types, BooleanValidator<any>>> = {
     boolean: b => typeof b === 'boolean'
 }
 
-export class Option<T extends Types, R extends boolean, A extends boolean> {
+const optionDataKey = Symbol('__data');
+
+export type OptData<T> = {
+    type: Types;
+    labelName: string;
+    description: string;
+    isRequired: boolean;
+    aliases: string[];
+    isArray: boolean;
+    defaultValue?: T;
+    validators: Validator<any>[];
+    prePreprocessors: Preprocessor[];
+    postPreprocessors: Preprocessor[];
+};
+
+export function getOptData(opt: Option<any, any, any, any>) {
+    return opt[optionDataKey];
+}
+
+export function setOptData(opt: Option<any, any, any, any>, data: OptData<any>) {
+    opt[optionDataKey] = data;
+}
+
+export function cloneOption<O extends Option<any, any, any, any>>(opt: O): O {
+    const oldOpt = opt;
+    const oldData = getOptData(oldOpt);
+    opt = new Option(oldData.type) as any;
+    setOptData(opt, oldData);
+    return opt;
+}
+
+export function updateOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>) {
+    return changeOptData(cloneOption(opt), data);
+}
+
+export function changeOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>) {
+    setOptData(opt, {
+        ...getOptData(opt),
+        ...data
+    });
+    return opt;
+}
+
+export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
     name: string = '';
-    private type: Types;
-    private labelName: string;
-    private description: string = '';
-    private isRequired: boolean = false;
-    private aliases: string[] = [];
-    private isArray: boolean = false;
-    private defaultValue?: ResolveType<T>;
-    private validators: Validator<any>[] = [];
-    private prePreprocessors: Preprocessor[] = [];
-    private postPreprocessors: Preprocessor[] = [];
+        [optionDataKey]: OptData<RT> = {
+        type: 'any',
+        labelName: 'any',
+        description: '',
+        isRequired: false,
+        aliases: [],
+        isArray: false,
+        defaultValue: undefined,
+        validators: [],
+        prePreprocessors: [],
+        postPreprocessors: [],
+    };
 
     private _isRequired!: R;
     private _isArray!: A;
 
     constructor(type: T) {
-        this.type = type;
-        this.labelName = type;
+        this[optionDataKey].type = type;
+        this[optionDataKey].labelName = type;
         const intrinsicValidator = intrinsicValidators[type];
         if (intrinsicValidator) {
-            this.validate(value => {
-                if (intrinsicValidator(value)) {
-                    return;
-                }
-                throw new Error(`expected <${this.labelName}>, but received <${typeof value}>`);
+            changeOptData(this, {
+                validators: [
+                    value => {
+                        if (intrinsicValidator(value)) {
+                            return;
+                        }
+                        throw new Error(`expected <${this[optionDataKey].labelName}>, but received <${typeof value}>`);
+                    }
+                ]
             });
         }
         const intrinsicPreProcessor = intrinsicPreProcessors[type];
         if (intrinsicPreProcessor) {
-            this.process('pre', intrinsicPreProcessor as Preprocessor);
+            changeOptData(this, {
+                prePreprocessors: [intrinsicPreProcessor as Preprocessor]
+            })
         }
     }
 
-    label(name: string) {
-        this.labelName = name;
-        return this;
+    label(name: string): Option<T, R, A, RT> {
+        return updateOptData(this, {
+            labelName: name
+        });
     }
 
-    alias(...aliases: string[]) {
-        this.aliases = this.aliases.concat(aliases);
-        return this;
+    alias(...aliases: string[]): Option<T, R, A, RT> {
+        return updateOptData(this, {
+            aliases: this[optionDataKey].aliases.concat(aliases)
+        });
     }
 
-    desc(text: string) {
-        this.description = text;
-        return this;
+    description(text: string): Option<T, R, A, RT> {
+        return updateOptData(this, {
+            description: text
+        });
     }
 
-    required() {
-        this.isRequired = true;
-        return this as any as Option<T, true, A>;
+    required(): Option<T, true, A, RT> {
+        return updateOptData(this, {
+            isRequired: true
+        }) as any;
     }
 
-    array() {
-        this.isArray = true;
-        return this as any as Option<T, R, true>;
+    array(): Option<T, R, true, RT> {
+        return updateOptData(this, {
+            isArray: true
+        }) as any;
     }
 
-    default(value: ResolveType<T>) {
-        this.defaultValue = value;
-        this.isRequired = false;
-        this.process('post', v => v === undefined ? value : v);
-        return this as any as Option<T, true, A>;
+    default(value: RT): Option<T, true, A, RT> {
+        return updateOptData(this, {
+            isRequired: true,
+            defaultValue: value,
+        }).process('post', v => v === undefined ? value : v) as any;
     }
 
-    validate(errorMsg: string, validator: BooleanValidator<T>): Option<T, R, A>;
-    validate(validator: Validator<T>): Option<T, R, A>;
-    validate(...args: any[]): Option<T, R, A> {
+    validate(errorMsg: string, validator: BooleanValidator<T>): Option<T, R, A, RT>;
+    validate(validator: Validator<T>): Option<T, R, A, RT>;
+    validate(...args: any[]): Option<T, R, A, RT> {
         const validator = args.length === 2
             ? makeValidator(args[0], args[1])
             : args[0];
-        this.validators.push(validator);
-        return this;
+        return updateOptData(this, {
+            validators: getOptData(this).validators.concat(validator),
+        });
     }
 
 
-    process(phase: 'pre', fn: Preprocessor<any, ResolveType<T>>): Option<T, R, A>;
-    process(phase: 'post', fn: Preprocessor<ResolveType<T>, ResolveType<T>>): Option<T, R, A>;
-    process(phase: 'pre' | 'post', fn: Preprocessor): Option<T, R, A> {
+    process(phase: 'pre', fn: Preprocessor<any, ResolveType<T>>): Option<T, R, A, RT>;
+    process<FR>(phase: 'post', fn: Preprocessor<ResolveType<T>, FR>): Option<T, R, A, FR>;
+    process(phase: 'pre' | 'post', fn: Preprocessor): Option<T, R, A, RT> {
         switch (phase) {
-            case 'pre': this.prePreprocessors.push(fn); break;
-            case 'post': this.postPreprocessors.push(fn); break;
+            case 'pre':
+                return updateOptData(this, {
+                    prePreprocessors: getOptData(this).prePreprocessors.concat(fn),
+                });
+            case 'post':
+                return updateOptData(this, {
+                    postPreprocessors: getOptData(this).postPreprocessors.concat(fn),
+                });
             default:
                 throw new Error(`unknown phase "${phase}"`);
-        }
-        return this;
-    }
-
-    __getData() {
-        return {
-            type: this.type,
-            description: this.description,
-            isRequired: this.isRequired,
-            aliases: this.aliases,
-            isArray: this.isArray,
-            defaultValue: this.defaultValue,
-            validators: this.validators,
-            prePreprocessors: this.prePreprocessors,
-            postPreprocessors: this.postPreprocessors,
-            labelName: this.labelName
         }
     }
 }
 
-export type OptionSet = Record<string, Option<any, boolean, boolean>>;
+export type OptionSet = Record<string, Option<any, boolean, boolean, any>>;

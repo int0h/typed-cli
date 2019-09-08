@@ -82,6 +82,12 @@ export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {
     }
     value = runPreprocessors(optCfg.prePreprocessors, value);
     const errors = validateOption(optCfg, value);
+    if (errors.length > 0) {
+        return {errors, value};
+    }
+    if (!optCfg.isRequired && value === undefined) {
+        return {errors, value};
+    }
     value = runPreprocessors(optCfg.postPreprocessors, value);
     return {errors, value};
 }
