@@ -1,4 +1,10 @@
-- postProcess typing
-- tests
-- fix string validation for number-like strings
-- define custom types
++ postProcess typing
+* tests
++ fix string validation for number-like strings
++ define custom types
+- refactoring
+- maximize test coverage
+- commands
+- position arguments
+- bash complition
+- locale

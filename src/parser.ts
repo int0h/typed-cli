@@ -11,7 +11,7 @@ function checkAliasCollisions(opts: OptionSet) {
 
     const check = (str: string) => {
         if (usedKeys.has(str)) {
-            throw new Error(`alias collision for "${str}"`);
+            throw new Error(`alias collision for "${str}"`); //
         }
         usedKeys.add(str);
     }
@@ -66,12 +66,12 @@ export function configure<D extends CliDeclaration>(decl: D): {
             const {value, errors} = handleOption(getOptData(decl._), parsedArgs);
             if (errors.length > 0) {
                 printArgumentError(errors);
-                throw new Error('\nProvided arguments are NOT valid');
+                throw new Error('\nProvided arguments are NOT valid'); //
             }
             res._ = value;
         }
         if (!report.isValid) {
-            throw new Error('\nProvided options are NOT valid');
+            throw new Error('\nProvided options are NOT valid'); //
         }
         return res;
     }

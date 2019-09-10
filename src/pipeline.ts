@@ -117,6 +117,6 @@ export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Rec
     }
     report.warnings = Object.keys(dataCopy)
         .filter(key => !usedKeys.has(key))
-        .map(key => `unknown option "${key}"`);
+        .map(key => `unknown option "${key}"`); //
     return {data, report};
 }

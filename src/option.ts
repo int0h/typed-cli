@@ -99,7 +99,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
                         if (intrinsicValidator(value)) {
                             return;
                         }
-                        throw new Error(`expected <${this[optionDataKey].labelName}>, but received <${typeof value}>`);
+                        throw new Error(`expected <${this[optionDataKey].labelName}>, but received <${typeof value}>`); //
                     }
                 ]
             });
@@ -174,7 +174,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
                     postPreprocessors: getOptData(this).postPreprocessors.concat(fn),
                 });
             default:
-                throw new Error(`unknown phase "${phase}"`);
+                throw new Error(`unknown phase "${phase}"`); //
         }
     }
 }

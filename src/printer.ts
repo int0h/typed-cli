@@ -8,12 +8,12 @@ import { Option, getOptData } from './option';
 export function printOptionError(title: string, errors: string[]) {
     console.error(title);
     for (const err of errors) {
-        console.error(`\t ${chalk.red('>')} ` + err);
+        console.error(`\t ${chalk.red('>')} ` + err); //
     }
 }
 
 export function printArgumentError(errors: string[]) {
-    printOptionError(`❌  ` + chalk.redBright(`arguments are invalid`), errors);
+    printOptionError(`❌  ` + chalk.redBright(`arguments are invalid`), errors); //
 }
 
 export function printReport(report: ValidationReport) {
@@ -24,7 +24,7 @@ export function printReport(report: ValidationReport) {
         if (item.errors.length === 0) {
             continue;
         }
-        printOptionError(`❌  ` + chalk.redBright(`option " ${key} " is invalid`), item.errors);
+        printOptionError(`❌  ` + chalk.redBright(`option " ${key} " is invalid`), item.errors); //
     }
 }
 
@@ -83,13 +83,13 @@ function generateOptionDescription(config: CliDeclaration, decorator: HelpDecora
 
         // optionality
         if (optData.isArray) {
-            lineParts.push(decorator('[multiple]', 'optionality-multiple'));
+            lineParts.push(decorator('[multiple]', 'optionality-multiple')); //
         } else if (optData.defaultValue) {
-            lineParts.push(decorator(`[=${optData.defaultValue}]`, 'optionality'))
+            lineParts.push(decorator(`[=${optData.defaultValue}]`, 'optionality')) //
         } else if (!optData.isRequired) {
-            lineParts.push(decorator('[optional]', 'optionality'));
+            lineParts.push(decorator('[optional]', 'optionality')); //
         } else {
-            lineParts.push(decorator('[required]', 'optionality-required'));
+            lineParts.push(decorator('[required]', 'optionality-required')); //
         }
 
         // description
@@ -165,20 +165,20 @@ export function generateHelp(config: CliDeclaration, decorator: HelpDecorator = 
     const {description, _} = config;
 
     description && textAbstracts.push(
-        decorator('Description:', 'title')
+        decorator('Description:', 'title') //
         + '\n' +
         description
     );
 
     textAbstracts.push(
-        decorator('Usage:', 'title')
+        decorator('Usage:', 'title') //
         + '\n    ' +
         generateUsage(config, decorator)
     );
 
     const optDecription = generateOptionDescription(config, decorator);
     optDecription && textAbstracts.push(
-        decorator('Options:', 'title')
+        decorator('Options:', 'title') //
         + '\n' +
         optDecription
     );
