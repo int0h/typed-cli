@@ -1,4 +1,3 @@
-
 import {Validator, Preprocessor, makeValidator, BooleanValidator} from './pipeline';
 
 type TypeMap = {
@@ -65,6 +64,10 @@ export function changeOptData<O extends Option<any, any, any, any>>(opt: O, data
         ...data
     });
     return opt;
+}
+
+export function option<T extends Types>(type: T) {
+    return new Option<T, false, false, ResolveType<T>>(type);
 }
 
 export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
@@ -141,13 +144,13 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
 
     default(value: RT): Option<T, true, A, RT> {
         return updateOptData(this, {
-            isRequired: true,
+            isRequired: false,
             defaultValue: value,
-        }).process('post', v => v === undefined ? value : v) as any;
+        }) as any;
     }
 
-    validate(errorMsg: string, validator: BooleanValidator<T>): Option<T, R, A, RT>;
-    validate(validator: Validator<T>): Option<T, R, A, RT>;
+    validate(errorMsg: string, validator: BooleanValidator<RT>): Option<T, R, A, RT>;
+    validate(validator: Validator<RT>): Option<T, R, A, RT>;
     validate(...args: any[]): Option<T, R, A, RT> {
         const validator = args.length === 2
             ? makeValidator(args[0], args[1])

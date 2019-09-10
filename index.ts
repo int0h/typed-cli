@@ -1,1 +1,2 @@
-export {cli, option, configure} from './src/parser';
+export {cli, configure} from './src/parser';
+export {option} from './src/option';

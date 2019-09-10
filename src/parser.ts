@@ -1,6 +1,6 @@
 import yargsParser from 'yargs-parser';
 
-import {Option, OptionSet, Types, ResolveType, getOptData} from './option';
+import {OptionSet, getOptData, option} from './option';
 import {CliDeclaration, ResolveCliDeclaration} from './type-logic';
 import {handleAllOptions, handleOption} from './pipeline';
 import {printReport, printArgumentError, generateHelp, fancyHelpDecorator} from './printer';
@@ -95,8 +95,4 @@ export function cli<D extends CliDeclaration>(decl: D): ResolveCliDeclaration<D>
         process.exit(1);
         throw 1;
     }
-}
-
-export function option<T extends Types>(type: T) {
-    return new Option<T, false, false, ResolveType<T>>(type);
 }

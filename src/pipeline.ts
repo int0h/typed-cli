@@ -66,6 +66,7 @@ interface OptCfg extends ValidationCfg {
     prePreprocessors: Preprocessor[];
     postPreprocessors: Preprocessor[];
     isArray: boolean;
+    defaultValue?: any;
 }
 
 export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {value: any, errors: string[]} {
@@ -86,7 +87,11 @@ export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {
         return {errors, value};
     }
     if (!optCfg.isRequired && value === undefined) {
-        return {errors, value};
+        if (optCfg.defaultValue !== undefined) {
+            value = optCfg.defaultValue;
+        } else {
+            return {errors, value};
+        }
     }
     value = runPreprocessors(optCfg.postPreprocessors, value);
     return {errors, value};

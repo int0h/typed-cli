@@ -13,6 +13,15 @@
                 "${workspaceFolder}/**/*.js"
             ],
             "args": ["-p", "1", "ads", "--url", "g.co/"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug tests",
+            "program": "${workspaceFolder}/tests/index.ts",
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ],
         }
     ]
 }
