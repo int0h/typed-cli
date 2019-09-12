@@ -29,3 +29,9 @@ export function arrayPartition<T>(array: T[], fn: (item: T, index: number, array
         array.filter((item, index, array) => !fn(item, index, array))
     ];
 }
+
+export function tabText(text: string, prefix: string) {
+    return text.split('\n')
+        .map(line => prefix + line)
+        .join('\n');
+}

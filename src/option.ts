@@ -1,4 +1,5 @@
 import {Validator, Preprocessor, makeValidator, BooleanValidator} from './pipeline';
+import { allIssues } from './errors';
 
 type TypeMap = {
     number: number;
@@ -26,6 +27,7 @@ const intrinsicValidators: Partial<Record<Types, BooleanValidator<any>>> = {
 const optionDataKey = Symbol('__data');
 
 export type OptData<T> = {
+    name: string;
     type: Types;
     labelName: string;
     description: string;
@@ -33,6 +35,7 @@ export type OptData<T> = {
     aliases: string[];
     isArray: boolean;
     defaultValue?: T;
+    isArg?: boolean;
     validators: Validator<any>[];
     prePreprocessors: Preprocessor[];
     postPreprocessors: Preprocessor[];
@@ -72,7 +75,8 @@ export function option<T extends Types>(type: T) {
 
 export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
     name: string = '';
-        [optionDataKey]: OptData<RT> = {
+    [optionDataKey]: OptData<RT> = {
+        name: '',
         type: 'any',
         labelName: 'any',
         description: '',
@@ -99,7 +103,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
                         if (intrinsicValidator(value)) {
                             return;
                         }
-                        throw new Error(`expected <${this[optionDataKey].labelName}>, but received <${typeof value}>`); //
+                        throw new allIssues.TypeMismatchError(this[optionDataKey].labelName, typeof value);
                     }
                 ]
             });
@@ -174,7 +178,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
                     postPreprocessors: getOptData(this).postPreprocessors.concat(fn),
                 });
             default:
-                throw new Error(`unknown phase "${phase}"`); //
+                throw new Error(`invalid phase <${phase}>`);
         }
     }
 }

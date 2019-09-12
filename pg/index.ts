@@ -1,7 +1,9 @@
-import {cli, option} from '../';
+import {Parser, Printer, option} from '../';
 import urlOption from '../presets/url';
+import { en_US } from '../src/i18n';
+import { plain, fancy } from '../src/decorator';
 
-const data = cli({
+const parser = new Parser({
     command: 'tasker',
     description: `Blah blah`,
     options: {
@@ -12,8 +14,13 @@ const data = cli({
         url: urlOption.required().description('url 1'),
         url2: urlOption.description('url 2')
     },
-    _: option('number').required()
-})
+    _: option('number')
+});
 
+const printer = new Printer(en_US, fancy);
+
+const {data, report} = parser.parse('-p --sad')
+const rep = printer.generateHelp(parser.decl);
+console.error(rep);
 console.log('Ok');
-console.log(data.options.url);
+console.log(data);

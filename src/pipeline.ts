@@ -1,3 +1,6 @@
+import {Report, reportIssue, mergeReports, Issue, combineIssues, isError} from './report';
+import {allIssues} from './errors';
+
 export type Validator<T> = (value: T) => void;
 
 export type BooleanValidator<T> = (value: T) => boolean;
@@ -13,46 +16,52 @@ export function makeValidator<T>(errorMsg: string, fn: (value: T) => boolean): V
 
 export type Preprocessor<I = any, O = any> = (value: I) => O;
 
-function runValidator(validator: Validator<any>, value: any): string | undefined {
-    let msg: string | undefined = undefined;
+function runValidator(validator: Validator<any>, value: any): undefined | Error {
     try {
         validator(value);
     } catch(e) {
-        msg = e.message;
+        return e;
     }
-    return msg;
-}
-
-export type ValidationReport = {
-    isValid: boolean;
-    items: {
-        [key: string]: {
-            errors: string[];
-        }
-    };
-    warnings: string[];
 }
 
 interface ValidationCfg {
     isRequired: boolean;
     validators: Validator<any>[];
+    name: string;
+    isArg?: boolean;
 }
 
-function validateOption(optCfg: ValidationCfg, value: any): string[] {
-    const errors: string[] = [];
+function validateOption(optCfg: ValidationCfg, value: any): Report {
+    const issues: Issue[] = [];
     if (value === undefined) {
-        return optCfg.isRequired
-            ? ['required']
-            : [];
+        if (optCfg.isRequired) {
+            return {
+                issue: optCfg.isArg
+                    ? new allIssues.IvalidArguemntError(value)
+                    : new allIssues.IvalidOptionError(optCfg.name, value),
+                children: [{
+                    issue: new allIssues.EmptyReuiredOptionError(optCfg.name),
+                    children: []
+                }]
+            };
+        }
+        return {
+            issue: null,
+            children: []
+        };
     }
     const validators = optCfg.validators;
     validators.forEach(validator => {
         const error = runValidator(validator, value);
         if (error) {
-            errors.push(error);
+            issues.push(error);
         }
     });
-    return errors;
+    return combineIssues(
+        optCfg.isArg
+            ? new allIssues.IvalidArguemntError(value)
+            : new allIssues.IvalidOptionError(optCfg.name, value)
+    , issues);
 }
 
 function runPreprocessors(processors: Preprocessor[], value: any): any {
@@ -67,56 +76,73 @@ interface OptCfg extends ValidationCfg {
     postPreprocessors: Preprocessor[];
     isArray: boolean;
     defaultValue?: any;
+    isArg?: boolean;
 }
 
-export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {value: any, errors: string[]} {
+function handleArrayOption(optCfg: OptCfg, value: any): {value: any[], report: Report} {
+    value = ([] as any[]).concat(value);
+    let issues: Issue[] = [];
+    value.forEach((v: any) => {
+        const res = handleOption(optCfg, v, true);
+        value.push(res.value);
+        issues = [...issues, ...res.report.children.map(c => c.issue)];
+    });
+    const report = combineIssues(new allIssues.IvalidOptionError(optCfg.name, value), issues);
+    return {
+        report,
+        value: isError(report.issue) ? null : value
+    };
+}
+
+export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {value: any, report: Report} {
     if (optCfg.isArray && !iterating) {
-        const arrValue = ([] as any[]).concat(value);
-        let errorsArr: string[] = [];
-        let valueArr: string[] = [];
-        arrValue.forEach(v => {
-            const res = handleOption(optCfg, v, true);
-            errorsArr = errorsArr.concat(res.errors);
-            valueArr = valueArr.concat(res.value);
-        });
-        return {errors: errorsArr, value: valueArr};
+        return handleArrayOption(optCfg, value);
     }
     value = runPreprocessors(optCfg.prePreprocessors, value);
-    const errors = validateOption(optCfg, value);
-    if (errors.length > 0) {
-        return {errors, value};
+    const report = validateOption(optCfg, value);
+    if (isError(report.issue)) {
+        return {report, value: null};
     }
     if (!optCfg.isRequired && value === undefined) {
         if (optCfg.defaultValue !== undefined) {
             value = optCfg.defaultValue;
         } else {
-            return {errors, value};
+            return {report, value};
         }
     }
     value = runPreprocessors(optCfg.postPreprocessors, value);
-    return {errors, value};
+    return {
+        report,
+        value: isError(report.issue) ? null : value
+    };
 }
 
-export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Record<string, any>, usedKeys: Set<string>): {data: any, report: ValidationReport} {
-    const report: ValidationReport = {
-        isValid: true,
-        items: {},
-        warnings: []
-    };
+export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Record<string, any>, usedKeys: Set<string>): {data: any, report: Report} {
     const data: any = {};
     const dataCopy = {...rawData};
+    let isValid = true;
+    const allReports: Report[] = [];
     for (const [key, optCfg] of Object.entries(optSchema)) {
         const dataValue = dataCopy[key];
         delete dataCopy[key];
-        const {value, errors} = handleOption(optCfg, dataValue);
-        if (errors.length > 0) {
-            report.isValid = false;
+        const {value, report} = handleOption(optCfg, dataValue);
+        if (isError(report.issue)) {
+            isValid = false;
         }
-        report.items[key] = {errors};
+        isError(report.issue) && allReports.push(report);
         data[key] = value;
     }
-    report.warnings = Object.keys(dataCopy)
+    const report = {
+        issue: isValid ? null : new allIssues.SomeIvalidOptionsError(),
+        children: allReports
+    };
+    const warnings = Object.keys(dataCopy)
         .filter(key => !usedKeys.has(key))
-        .map(key => `unknown option "${key}"`); //
+        .map(key => new allIssues.UnknownOptionWarning(key))
+        .map(warning => ({
+            issue: warning,
+            children: []
+        }));
+    report.children = report.children.concat(warnings);
     return {data, report};
 }
