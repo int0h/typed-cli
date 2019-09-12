@@ -1,7 +1,9 @@
 import test from 'tape';
 
-import {option, getOptData} from '../src/option';
-import {handleAllOptions, handleOption} from '../src/pipeline';
+import {option, getOptData} from '../../src/option';
+import {handleAllOptions, handleOption} from '../../src/pipeline';
+import { isError, Report } from '../../src/report';
+import { IssueType, allIssues } from '../../src/errors';
 
 test('handleOption', t => {
     const opt = option('int')
@@ -10,9 +12,9 @@ test('handleOption', t => {
         .process('post', i => i / 256)
         .process('post', i => i * 2 - 1);
 
-    const {value, errors} = handleOption(getOptData(opt), 128);
+    const {value, report} = handleOption(getOptData(opt), 128);
     t.equal(value, 0);
-    t.deepEqual(errors, []);
+    t.deepEqual(report.children, []);
     t.end();
 });
 
@@ -44,11 +46,29 @@ test('handleArrayOption', t => {
         .process('post', i => Math.round(i * 100) / 100)
         .array();
 
-    const {value, errors} = handleOption(getOptData(opt), [0, 128, 255]);
+    const {value, report} = handleOption(getOptData(opt), [0, 128, 255]);
     t.deepEqual(value, [-1, 0, 1]);
-    t.deepEqual(errors, []);
+    t.deepEqual(report.children, []);
     t.end();
 });
+
+type ReportReference = {
+    issue: [new (...args: any[]) => IssueType, Record<string, any>],
+    children: ReportReference[]
+};
+
+function validateReport(r: Report, ref: ReportReference) {
+    const [IssueClass, shape] = ref.issue;
+    if (!(r.issue instanceof (IssueClass as any))) {
+        throw new Error('report issue is wrong class');
+    }
+    for (const key of Object.keys(shape)) {
+        if ((r.issue as any)[key] !== shape[key]) {
+            throw new Error(`report Error.${key} is incorrect`);
+        }
+    }
+    ref.children.forEach((ref, i) => validateReport(r.children[i], ref));
+}
 
 test('invalid options', t => {
     const opt1 = option('int')
@@ -64,9 +84,30 @@ test('invalid options', t => {
         opt2: getOptData(opt2)
     }, {opt1: false, opt2: false, opt3: false}, new Set() as any);
 
-    t.true(report.items.opt1.errors.length > 0);
-    t.true(report.items.opt2.errors.length > 0);
-    t.true(report.warnings.length > 0);
-    t.true(!report.isValid);
+    validateReport(report, {
+        issue: [allIssues.SomeIvalidOptionsError, {}],
+        children: [
+            {
+                issue: [allIssues.IvalidOptionError, {value: false}],
+                children: [{
+                    issue: [allIssues.TypeMismatchError, {expected: 'int', received: 'boolean'}],
+                    children: []
+                }]
+            },
+            {
+                issue: [allIssues.IvalidOptionError, {value: false}],
+                children: [{
+                    issue: [allIssues.TypeMismatchError, {expected: 'string', received: 'boolean'}],
+                    children: []
+                }]
+            },
+            {
+                issue: [allIssues.UnknownOptionWarning, {}],
+                children: []
+            }
+        ]
+    })
+
+    t.true(isError(report.issue));
     t.end();
 });

@@ -79,18 +79,19 @@ interface OptCfg extends ValidationCfg {
     isArg?: boolean;
 }
 
-function handleArrayOption(optCfg: OptCfg, value: any): {value: any[], report: Report} {
+function handleArrayOption(optCfg: OptCfg, value: any): {value: any[] | null, report: Report} {
     value = ([] as any[]).concat(value);
     let issues: Issue[] = [];
+    const resValue: any[] = [];
     value.forEach((v: any) => {
         const res = handleOption(optCfg, v, true);
-        value.push(res.value);
+        resValue.push(res.value);
         issues = [...issues, ...res.report.children.map(c => c.issue)];
     });
     const report = combineIssues(new allIssues.IvalidOptionError(optCfg.name, value), issues);
     return {
         report,
-        value: isError(report.issue) ? null : value
+        value: isError(report.issue) ? null : resValue
     };
 }
 

@@ -1,9 +1,10 @@
 import test from 'tape';
 
-import {option, getOptData} from '../src/option';
+import {option, getOptData} from '../../src/option';
 
 test('option basic', t => {
     t.deepEqual(getOptData(option('any')), {
+        name: '',
         type: 'any',
         labelName: 'any',
         description: '',
@@ -37,6 +38,7 @@ test('option basic', t => {
     const data = getOptData(opt);
     delete data.postPreprocessors;
     t.deepEqual(data, {
+        name: '',
         type: 'any',
         labelName: 'label',
         description: 'description',

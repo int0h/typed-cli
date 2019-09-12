@@ -18,7 +18,7 @@
             "type": "node",
             "request": "launch",
             "name": "Debug tests",
-            "program": "${workspaceFolder}/tests/index.ts",
+            "program": "${workspaceFolder}/tests/unit/index.ts",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ],

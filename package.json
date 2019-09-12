@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nyc node ./tests/index.js | tap-spec",
-    "test-report": "nyc -r html node ./tests/index.js | tap-spec"
+    "test": "nyc node ./tests/unit/index.js | tap-spec",
+    "test-report": "nyc -r html node ./tests/unit/index.js | tap-spec"
   },
   "keywords": [],
   "author": "",

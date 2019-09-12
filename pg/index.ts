@@ -20,7 +20,7 @@ const parser = new Parser({
 const printer = new Printer(en_US, fancy);
 
 const {data, report} = parser.parse('-p --sad')
-const rep = printer.generateHelp(parser.decl);
-console.error(rep);
+// const rep = printer.generateHelp(parser.decl);
+// console.error(rep);
 console.log('Ok');
 console.log(data);

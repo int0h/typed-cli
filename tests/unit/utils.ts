@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import {alignTextMatrix, createKebabAlias, objMap, arrayPartition} from '../src/utils';
+import {alignTextMatrix, createKebabAlias, objMap, arrayPartition, tabText} from '../../src/utils';
 
 test('alignTextMatrix', t => {
     t.deepEqual(alignTextMatrix([
@@ -29,5 +29,10 @@ test('objMap', t => {
 
 test('arrayPartition', t => {
     t.deepEqual(arrayPartition([1, 2, 3, 4, 5], i => i % 2 === 0), [[2, 4], [1, 3, 5]]);
+    t.end();
+});
+
+test('tabText', t => {
+    t.equal(tabText('abc\ndef', '! '), '! abc\n! def');
     t.end();
 });
