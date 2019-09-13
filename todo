@@ -9,3 +9,7 @@
 - bash complition
 + locale
 - option deprication?
+- cli helper
+- descriptions as functions
+- markdown in descriptions?
+- linter

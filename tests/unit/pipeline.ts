@@ -109,5 +109,6 @@ test('invalid options', t => {
     })
 
     t.true(isError(report.issue));
+    t.equal(data, null);
     t.end();
 });
