@@ -1,9 +1,9 @@
 + postProcess typing
-* tests
++ tests
 + fix string validation for number-like strings
 + define custom types
 * refactoring
-- maximize test coverage
++ maximize test coverage
 - commands
 - position arguments
 - bash complition
@@ -12,4 +12,4 @@
 - cli helper
 - descriptions as functions
 - markdown in descriptions?
-- linter
++ linter

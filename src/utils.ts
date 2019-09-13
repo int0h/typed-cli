@@ -13,7 +13,7 @@ export function objMap<T, R>(obj: Record<string, T>, fn: (item: T) => R): Record
     return res;
 }
 
-export function alignTextMatrix(textMatrix: string[][]) {
+export function alignTextMatrix(textMatrix: string[][]): string[][] {
     const colSizes: number[] = [];
     textMatrix.forEach(line => {
         line.forEach((text, index) => colSizes[index] = Math.max(colSizes[index] || 0, text.length));
@@ -30,7 +30,7 @@ export function arrayPartition<T>(array: T[], fn: (item: T, index: number, array
     ];
 }
 
-export function tabText(text: string, prefix: string) {
+export function tabText(text: string, prefix: string): string {
     return text.split('\n')
         .map(line => prefix + line)
         .join('\n');

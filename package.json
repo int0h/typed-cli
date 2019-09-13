@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint . --ignore-path ./.gitignore --ext .ts",
     "test": "nyc node ./tests/unit/index.js | tap-spec",
     "test-report": "nyc -r html node ./tests/unit/index.js | tap-spec"
   },
@@ -22,8 +23,12 @@
     "@types/node": "^12.7.4",
     "@types/tape": "^4.2.33",
     "@types/yargs-parser": "^13.1.0",
+    "@typescript-eslint/eslint-plugin": "^2.2.0",
+    "@typescript-eslint/parser": "^2.2.0",
+    "eslint": "^6.3.0",
     "nyc": "^14.1.1",
     "source-map-support": "^0.5.13",
-    "ts-node": "^8.3.0"
+    "ts-node": "^8.3.0",
+    "typescript": "^3.6.3"
   }
 }

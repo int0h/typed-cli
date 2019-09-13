@@ -6,7 +6,7 @@ export type Validator<T> = (value: T) => void;
 export type BooleanValidator<T> = (value: T) => boolean;
 
 export function makeValidator<T>(errorMsg: string, fn: (value: T) => boolean): Validator<T> {
-    return (value: any) => {
+    return (value: any): void => {
         if (fn(value)) {
             return;
         }
@@ -79,7 +79,7 @@ interface OptCfg extends ValidationCfg {
     isArg?: boolean;
 }
 
-function handleArrayOption(optCfg: OptCfg, value: any): {value: any[] | null, report: Report} {
+function handleArrayOption(optCfg: OptCfg, value: any): {value: any[] | null; report: Report} {
     value = ([] as any[]).concat(value);
     let issues: Issue[] = [];
     const resValue: any[] = [];
@@ -95,7 +95,7 @@ function handleArrayOption(optCfg: OptCfg, value: any): {value: any[] | null, re
     };
 }
 
-export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {value: any, report: Report} {
+export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {value: any; report: Report} {
     if (optCfg.isArray && !iterating) {
         return handleArrayOption(optCfg, value);
     }
@@ -118,7 +118,7 @@ export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {
     };
 }
 
-export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Record<string, any>, usedKeys: Set<string>): {data: any, report: Report} {
+export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Record<string, any>, usedKeys: Set<string>): {data: any; report: Report} {
     const data: any = {};
     const dataCopy = {...rawData};
     let isValid = true;

@@ -14,6 +14,7 @@ function __declareEnglishTextsLocale<T extends Record<string, LocaleFn>>(locale:
     return locale;
 }
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const en_US = {
     code: 'en_US',
     texts: __declareEnglishTextsLocale({
@@ -35,9 +36,10 @@ export const en_US = {
         IvalidArguemntError: (e, d) => `provided argument value <${d.invalidValue(e.value)}> is not valid`,
     } as IssueLocale
 };
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 export type Locale = typeof en_US;
 
-export function declareLocale(locale: Locale) {
+export function declareLocale(locale: Locale): Locale {
     return locale;
 }

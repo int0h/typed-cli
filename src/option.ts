@@ -41,11 +41,11 @@ export type OptData<T> = {
     postPreprocessors: Preprocessor[];
 };
 
-export function getOptData(opt: Option<any, any, any, any>) {
+export function getOptData(opt: Option<any, any, any, any>): OptData<unknown> {
     return opt[optionDataKey];
 }
 
-export function setOptData(opt: Option<any, any, any, any>, data: OptData<any>) {
+export function setOptData(opt: Option<any, any, any, any>, data: OptData<any>): void {
     opt[optionDataKey] = data;
 }
 
@@ -57,11 +57,11 @@ export function cloneOption<O extends Option<any, any, any, any>>(opt: O): O {
     return opt;
 }
 
-export function updateOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>) {
+export function updateOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>): O {
     return changeOptData(cloneOption(opt), data);
 }
 
-export function changeOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>) {
+export function changeOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>): O {
     setOptData(opt, {
         ...getOptData(opt),
         ...data
@@ -69,12 +69,12 @@ export function changeOptData<O extends Option<any, any, any, any>>(opt: O, data
     return opt;
 }
 
-export function option<T extends Types>(type: T) {
+export function option<T extends Types>(type: T): Option<T, false, false, ResolveType<T>> {
     return new Option<T, false, false, ResolveType<T>>(type);
 }
 
 export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
-    name: string = '';
+    name = '';
     [optionDataKey]: OptData<RT> = {
         name: '',
         type: 'any',
@@ -99,7 +99,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
         if (intrinsicValidator) {
             changeOptData(this, {
                 validators: [
-                    value => {
+                    (value): void => {
                         if (intrinsicValidator(value)) {
                             return;
                         }

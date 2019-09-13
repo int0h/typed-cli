@@ -28,7 +28,7 @@ test('handleAllOptions', t => {
     const opt2 = option('string')
         .default('abc');
 
-    const {data, report} = handleAllOptions({
+    const {data} = handleAllOptions({
         opt1: getOptData(opt1),
         opt2: getOptData(opt2)
     }, {opt1: 128}, new Set() as any);
@@ -53,11 +53,11 @@ test('handleArrayOption', t => {
 });
 
 type ReportReference = {
-    issue: [new (...args: any[]) => IssueType, Record<string, any>],
-    children: ReportReference[]
+    issue: [new (...args: any[]) => IssueType, Record<string, any>];
+    children: ReportReference[];
 };
 
-function cheapDeepEqual(v1: any, v2: any) {
+function cheapDeepEqual(v1: any, v2: any): boolean {
     const res = JSON.stringify(v1) === JSON.stringify(v2);
     if (!res) {
         console.error('not equal:', v1, v2);
@@ -65,7 +65,7 @@ function cheapDeepEqual(v1: any, v2: any) {
     return res;
 }
 
-export function validateReport(r: Report, ref: ReportReference) {
+export function validateReport(r: Report, ref: ReportReference): void {
     const [IssueClass, shape] = ref.issue;
     if (!(r.issue instanceof (IssueClass as any))) {
         throw new Error('report issue is wrong class');

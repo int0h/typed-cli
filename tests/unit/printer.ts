@@ -5,8 +5,6 @@ import { en_US } from '../../src/i18n';
 import { plain } from '../../src/decorator';
 import { option } from '../../src/option';
 import { Parser } from '../../src/parser';
-import { validateReport } from './pipeline';
-import { allIssues } from '../../src/errors';
 
 const helpTextRef =
 `Description
@@ -162,7 +160,7 @@ test('printer:stringifyReport:basic types', t => {
             foo: option('string').validate('custom:error', () => false),
             bar: option('string').validate(() => {
                 class CustomError extends Error {
-                    stringify() {
+                    stringify(): string {
                         return 'custom:error:stringify'
                     }
                 }
@@ -199,7 +197,7 @@ test('printer:stringifyReport:valid report', t => {
         }
     });
 
-    const {data, report} = parser.parse([
+    const {report} = parser.parse([
         '--booleanOpt'
     ]);
 

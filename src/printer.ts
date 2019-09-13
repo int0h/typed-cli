@@ -67,9 +67,8 @@ export class Printer {
             .join('\n');
     }
 
-    private generateUsage(config: Required<CliDeclaration>) {
+    private generateUsage(config: Required<CliDeclaration>): string {
         const d = this.decorator;
-        const l = this.locale;
 
         const options = config.options;
 
@@ -130,7 +129,7 @@ export class Printer {
         const l = this.locale;
 
         const textAbstracts: string[] = [];
-        const {description, _} = decl;
+        const {description} = decl;
 
         description && textAbstracts.push(
             d.title(l.texts.title_description(d))
@@ -156,7 +155,7 @@ export class Printer {
             .replace(/[\ \t]+\n/g, '\n');
     }
 
-    private printReportLayer(report: Report, level: number) {
+    private printReportLayer(report: Report, level: number): string {
         const d = this.decorator;
         const l = this.locale;
 

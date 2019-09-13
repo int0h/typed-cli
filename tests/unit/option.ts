@@ -20,9 +20,9 @@ test('option basic', t => {
 });
 
 test('option basic', t => {
-    const preFn = () => {};
-    const postFn = () => {};
-    const valFn = () => {};
+    const preFn = (): void => {};
+    const postFn = (): void => {};
+    const valFn = (): void => {};
 
     const opt = option('any')
         .alias('alias1', 'alias2')

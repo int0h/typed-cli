@@ -1,10 +1,10 @@
-import {Option, OptionSet, Types, ResolveType} from './option';
+import {Option, OptionSet, Types} from './option';
 
-export type GetPropertiyNames<T extends Object, P> = {
+export type GetPropertiyNames<T extends Record<string, unknown>, P> = {
     [K in keyof T]: T[K] extends P ? K : never;
 }[keyof T];
 
-export type GetProperties<T extends Object, P> = Pick<T, GetPropertiyNames<T, P>>;
+export type GetProperties<T extends Record<string, unknown>, P> = Pick<T, GetPropertiyNames<T, P>>;
 
 type PickRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, true, boolean, any> | Option<any, boolean, true, any>>;
 type PickNonRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, false, boolean, any>>;

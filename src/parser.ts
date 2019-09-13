@@ -1,19 +1,18 @@
 import yargsParser from 'yargs-parser';
 
-import {OptionSet, getOptData, option, OptData, changeOptData, updateOptData} from './option';
+import {OptionSet, getOptData, updateOptData} from './option';
 import {CliDeclaration, ResolveCliDeclaration} from './type-logic';
 import {handleAllOptions, handleOption} from './pipeline';
-// import {printReport, printArgumentError, generateHelp, fancyHelpDecorator} from './printer';
 import {createKebabAlias, objMap} from './utils';
 import { Report, mergeReports, isError } from './report';
 import { allIssues } from './errors';
 
-function checkAliasCollisions(opts: OptionSet) {
+function checkAliasCollisions(opts: OptionSet): Set<string> {
     const usedKeys = new Set<string>();
 
-    const check = (str: string) => {
+    const check = (str: string): void => {
         if (usedKeys.has(str)) {
-            throw new Error(`alias collision for "${str}"`); //
+            throw new Error(`alias collision for "${str}"`);
         }
         usedKeys.add(str);
     }
@@ -26,8 +25,7 @@ function checkAliasCollisions(opts: OptionSet) {
     return usedKeys;
 }
 
-export function prepareCliDeclaration(decl: CliDeclaration): {decl: Required<CliDeclaration>, usedKeys: Set<string>} {
-    const {_ = option('any')} = decl;
+export function prepareCliDeclaration(decl: CliDeclaration): {decl: Required<CliDeclaration>; usedKeys: Set<string>} {
     const resDecl = {...decl};
     resDecl.options = {...(decl.options || {})};
     for (const [name, opt] of Object.entries(resDecl.options)) {
@@ -49,7 +47,7 @@ export function prepareCliDeclaration(decl: CliDeclaration): {decl: Required<Cli
     return {decl: resDecl as Required<CliDeclaration>, usedKeys};
 }
 
-function extractOptionsFromYargs(data: any) {
+function extractOptionsFromYargs(data: any): any {
     const copyData = {...data};
     delete copyData.$0;
     delete copyData._;
@@ -68,11 +66,11 @@ export class Parser<D extends CliDeclaration> {
         this.optCfg = objMap(declPrepared.options, item => getOptData(item));
     }
 
-    private parseOptions(parsed: any): {data: any, report: Report} {
+    private parseOptions(parsed: any): {data: any; report: Report} {
         return handleAllOptions(this.optCfg, extractOptionsFromYargs(parsed), this.usedKeys);
     }
 
-    private normalizeArgs(args: any[]) {
+    private normalizeArgs(args: any[]): undefined | unknown | unknown[] {
         switch (args.length) {
             case 0:
                 return undefined;
@@ -83,7 +81,7 @@ export class Parser<D extends CliDeclaration> {
         }
     }
 
-    private parseArguments(parsed: any): {data: any, report: Report} {
+    private parseArguments(parsed: any): {data: any; report: Report} {
         if (this.decl._) {
             const parsedArgs = getOptData(this.decl._).isArray
                 ? parsed._
@@ -103,7 +101,7 @@ export class Parser<D extends CliDeclaration> {
         return {data: null, report: {issue: null, children: []}};
     }
 
-    parse(argv: string[] | string): {report: Report, data: ResolveCliDeclaration<D> | null} {
+    parse(argv: string[] | string): {report: Report; data: ResolveCliDeclaration<D> | null} {
         const parsed = yargsParser(argv, {
             alias: this.decl.options && objMap(this.decl.options, item => getOptData(item).aliases)
         });

@@ -7,5 +7,11 @@
         "**/.DS_Store": true,
         "**/*.js.map": true,
         "**/*.d.ts": true
-    }
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ]
 }

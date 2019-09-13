@@ -1,4 +1,4 @@
-import {IssueType, BaseWarning, BaseError} from './errors';
+import {BaseWarning, BaseError} from './errors';
 
 // type ReportItem = {
 //     issue: IssueType;

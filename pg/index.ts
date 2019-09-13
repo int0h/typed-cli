@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {Parser, Printer, option} from '../';
 import urlOption from '../presets/url';
 import { en_US } from '../src/i18n';
