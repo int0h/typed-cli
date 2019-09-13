@@ -7,9 +7,9 @@ export class BaseWarning {
     isWarning = true;
 }
 
-class EmptyReuiredOptionError extends BaseError {
+class EmptyRequiredOptionError extends BaseError {
     requiredOption: string;
-    className = 'EmptyReuiredOptionError' as const;
+    className = 'EmptyRequiredOptionError' as const;
     constructor(requiredOption: string) {
         super();
         this.requiredOption = requiredOption;
@@ -56,7 +56,7 @@ class IvalidArguemntError extends BaseError {
 }
 
 class IvalidInputError extends BaseError {
-    className = 'SomeIvalidOptionsError' as const;
+    className = 'IvalidInputError' as const;
 }
 
 class UnknownOptionWarning extends BaseWarning {
@@ -74,7 +74,7 @@ export type IssueType = {
 
 export const allIssues = {
     UnknownOptionWarning,
-    EmptyReuiredOptionError,
+    EmptyRequiredOptionError,
     IvalidOptionError,
     IvalidSomeArguemntsError,
     IvalidArguemntError,

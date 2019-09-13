@@ -32,7 +32,9 @@ export function combineIssues(conclusion: Issue, issues: Issue[]): Report {
 }
 
 export function isError(issue?: Issue): boolean {
-    return Boolean(issue) && issue instanceof BaseError;
+    return !(issue instanceof BaseWarning)
+        &&
+        (Boolean(issue) || issue instanceof BaseError || issue instanceof Error);
 }
 
 export function mergeReports(conclusion: Issue, ...reports: Report[]): Report {
@@ -58,12 +60,12 @@ export function mergeReports(conclusion: Issue, ...reports: Report[]): Report {
 //     }
 // }
 
-export function reportIssue(err: IssueType): Report {
-    return {
-        issue: err,
-        children: []
-    };
-}
+// export function reportIssue(err: IssueType): Report {
+//     return {
+//         issue: err,
+//         children: []
+//     };
+// }
 
 // export class Report {
 //     issues: IssueType[] = [];

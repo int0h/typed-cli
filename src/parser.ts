@@ -1,6 +1,6 @@
 import yargsParser from 'yargs-parser';
 
-import {OptionSet, getOptData, option, OptData, changeOptData} from './option';
+import {OptionSet, getOptData, option, OptData, changeOptData, updateOptData} from './option';
 import {CliDeclaration, ResolveCliDeclaration} from './type-logic';
 import {handleAllOptions, handleOption} from './pipeline';
 // import {printReport, printArgumentError, generateHelp, fancyHelpDecorator} from './printer';
@@ -26,22 +26,27 @@ function checkAliasCollisions(opts: OptionSet) {
     return usedKeys;
 }
 
-function prepareCliDeclaration(decl: CliDeclaration) {
-    const {options = {}, _ = option('any')} = decl;
-    for (const [name, opt] of Object.entries(options)) {
+export function prepareCliDeclaration(decl: CliDeclaration): {decl: Required<CliDeclaration>, usedKeys: Set<string>} {
+    const {_ = option('any')} = decl;
+    const resDecl = {...decl};
+    resDecl.options = {...(decl.options || {})};
+    for (const [name, opt] of Object.entries(resDecl.options)) {
         const alias = createKebabAlias(name);
-        opt.name = name;
-        changeOptData(opt, {name});
+        let resOpt = updateOptData(opt, {name});
         if (alias) {
-            changeOptData(opt, {
+            resOpt = updateOptData(resOpt, {
                 aliases: [...getOptData(opt).aliases, alias]
             });
         }
+        resOpt.name = name;
+        resDecl.options[name] = resOpt;
     }
     if (decl._) {
-        changeOptData(decl._, {name: '#argument#', isArg: true})
+        resDecl._ = updateOptData(decl._, {name: '#argument#', isArg: true})
     }
-    return checkAliasCollisions(options);
+
+    const usedKeys = checkAliasCollisions(resDecl.options);
+    return {decl: resDecl as Required<CliDeclaration>, usedKeys};
 }
 
 function extractOptionsFromYargs(data: any) {
@@ -57,9 +62,10 @@ export class Parser<D extends CliDeclaration> {
     private usedKeys: Set<string>;
 
     constructor(decl: D) {
-        this.usedKeys = prepareCliDeclaration(decl);
-        this.decl = decl;
-        this.optCfg = objMap(decl.options || {}, item => getOptData(item));
+        const {decl: declPrepared, usedKeys} = prepareCliDeclaration(decl);
+        this.usedKeys = usedKeys;
+        this.decl = declPrepared as D;
+        this.optCfg = objMap(declPrepared.options, item => getOptData(item));
     }
 
     private parseOptions(parsed: any): {data: any, report: Report} {

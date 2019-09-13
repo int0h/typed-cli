@@ -26,7 +26,7 @@ export const en_US = {
     }),
     issues: {
         IvalidOptionError: (e, d) => `option <${d.invalidValue(e.optionName)}> is invalid`,
-        EmptyReuiredOptionError: (e, d) => `it's required`,
+        EmptyRequiredOptionError: (e, d) => `it's required`,
         IvalidInputError: (e, d) => `provided arguments were not correct`,
         SomeIvalidOptionsError: (e, d) => `some of the options are invalid`,
         UnknownOptionWarning: (e, d) => `option <${d.invalidValue(e.optionName)}> is not supported`,

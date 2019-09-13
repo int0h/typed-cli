@@ -5,6 +5,7 @@ import {CliDeclaration} from './type-logic';
 import { getOptData, Option } from './option';
 import { alignTextMatrix, arrayPartition, tabText } from './utils';
 import { BaseError, BaseWarning } from './errors';
+import { prepareCliDeclaration } from './parser';
 
 function findMinialAlias(opt: Option<any, any, any, any>): string {
     return [opt.name, ...getOptData(opt).aliases].sort((a, b) => a.length - b.length)[0];
@@ -19,14 +20,11 @@ export class Printer {
         this.decorator = decorator;
     }
 
-    private generateOptionDescription(config: CliDeclaration): string | undefined {
+    private generateOptionDescription(config: Required<CliDeclaration>): string | undefined {
         const d = this.decorator;
         const l = this.locale;
 
         const options = config.options;
-        if (!options) {
-            return;
-        }
 
         const optionTextMatrix: string[][] = [];
         for (const [name, optCgf] of Object.entries(options)) {
@@ -69,11 +67,11 @@ export class Printer {
             .join('\n');
     }
 
-    private generateUsage(config: CliDeclaration) {
+    private generateUsage(config: Required<CliDeclaration>) {
         const d = this.decorator;
         const l = this.locale;
 
-        const options = config.options || {};
+        const options = config.options;
 
         // options:
         const [requiredOpts, optionalOpts] = arrayPartition(Object.values(options), (opt) => {
@@ -126,6 +124,8 @@ export class Printer {
     }
 
     generateHelp(decl: CliDeclaration): string {
+        decl = prepareCliDeclaration(decl).decl;
+
         const d = this.decorator;
         const l = this.locale;
 
@@ -141,26 +141,24 @@ export class Printer {
         textAbstracts.push(
             d.title(l.texts.title_usage(d))
             + '\n    ' +
-            this.generateUsage(decl)
+            this.generateUsage(decl as Required<CliDeclaration>)
         );
 
-        const optDecription = this.generateOptionDescription(decl);
+        const optDecription = this.generateOptionDescription(decl as Required<CliDeclaration>);
         optDecription && textAbstracts.push(
             d.title(l.texts.title_options(d))
             + '\n' +
             optDecription
         );
 
-        return textAbstracts.join('\n\n');
+        return textAbstracts
+            .join('\n\n')
+            .replace(/[\ \t]+\n/g, '\n');
     }
 
     private printReportLayer(report: Report, level: number) {
         const d = this.decorator;
         const l = this.locale;
-
-        if (!report.issue) {
-            return '';
-        }
 
         let text = '';
 

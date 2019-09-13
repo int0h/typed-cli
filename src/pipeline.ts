@@ -40,7 +40,7 @@ function validateOption(optCfg: ValidationCfg, value: any): Report {
                     ? new allIssues.IvalidArguemntError(value)
                     : new allIssues.IvalidOptionError(optCfg.name, value),
                 children: [{
-                    issue: new allIssues.EmptyReuiredOptionError(optCfg.name),
+                    issue: new allIssues.EmptyRequiredOptionError(optCfg.name),
                     children: []
                 }]
             };
@@ -114,7 +114,7 @@ export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {
     value = runPreprocessors(optCfg.postPreprocessors, value);
     return {
         report,
-        value: isError(report.issue) ? null : value
+        value
     };
 }
 
@@ -123,7 +123,8 @@ export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Rec
     const dataCopy = {...rawData};
     let isValid = true;
     const allReports: Report[] = [];
-    for (const [key, optCfg] of Object.entries(optSchema)) {
+    for (const key of Object.keys(optSchema).sort()) {
+        const optCfg = optSchema[key];
         const dataValue = dataCopy[key];
         delete dataCopy[key];
         const {value, report} = handleOption(optCfg, dataValue);
@@ -145,5 +146,8 @@ export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Rec
             children: []
         }));
     report.children = report.children.concat(warnings);
+    if (isError(report.issue)) {
+        return {data: null, report};
+    }
     return {data, report};
 }

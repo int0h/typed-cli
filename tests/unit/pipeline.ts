@@ -57,13 +57,21 @@ type ReportReference = {
     children: ReportReference[]
 };
 
-function validateReport(r: Report, ref: ReportReference) {
+function cheapDeepEqual(v1: any, v2: any) {
+    const res = JSON.stringify(v1) === JSON.stringify(v2);
+    if (!res) {
+        console.error('not equal:', v1, v2);
+    }
+    return res;
+}
+
+export function validateReport(r: Report, ref: ReportReference) {
     const [IssueClass, shape] = ref.issue;
     if (!(r.issue instanceof (IssueClass as any))) {
         throw new Error('report issue is wrong class');
     }
     for (const key of Object.keys(shape)) {
-        if ((r.issue as any)[key] !== shape[key]) {
+        if (!cheapDeepEqual((r.issue as any)[key], shape[key])) {
             throw new Error(`report Error.${key} is incorrect`);
         }
     }
@@ -110,5 +118,72 @@ test('invalid options', t => {
 
     t.true(isError(report.issue));
     t.equal(data, null);
+    t.end();
+});
+
+test('handle strings containing digits only', t => {
+    const opt = option('string');
+
+    const res1 = handleOption(getOptData(opt), '123');
+    t.deepEqual(res1.value, '123');
+    t.deepEqual(res1.report.children, []);
+
+    const res2 = handleOption(getOptData(opt), 123);
+    t.deepEqual(res2.value, '123');
+    t.deepEqual(res2.report.children, []);
+    t.end();
+});
+
+test('custom validator', t => {
+    const opt = option('string')
+        .validate('invalid', () => false);
+
+    const res = handleOption(getOptData(opt), '123');
+    validateReport(res.report, {
+        issue: [allIssues.IvalidOptionError, {}], children: [{
+            issue: [Error as any, {message: 'invalid'}], children: []
+        }]
+    });
+
+    t.end();
+});
+
+test('empty required option', t => {
+    const opt = option('string')
+        .required();
+
+    const res = handleOption(getOptData(opt), undefined);
+    validateReport(res.report, {
+        issue: [allIssues.IvalidOptionError, {}], children: [{
+            issue: [allIssues.EmptyRequiredOptionError, {}], children: []
+        }]
+    });
+
+    t.end();
+});
+
+test('all empty & all optional', t => {
+    const opt = option('string');
+
+    const res = handleOption(getOptData(opt), undefined);
+    t.false(isError(res.report.issue));
+
+    t.equal(res.value, undefined);
+
+    t.end();
+});
+
+test('invalid array', t => {
+    const opt = option('string').array();
+
+    const res = handleOption(getOptData(opt), ['asd', true, false]);
+
+    validateReport(res.report, {
+        issue: [allIssues.IvalidOptionError, {}], children: [
+            {issue: [allIssues.TypeMismatchError, {}], children: []},
+            {issue: [allIssues.TypeMismatchError, {}], children: []}
+        ]
+    });
+
     t.end();
 });

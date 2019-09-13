@@ -1,10 +1,13 @@
 {
-    "includes": [
-        "./index.*",
-        "./src/**.*",
-        "./presets/**.*"
+    "include": [
+        "src/**",
+        "index.*"
+    ],
+    "exclude": [
+        "tests/*",
+        "src/i18n.*",
+        "src/decorator.*"
     ],
     "extends": "@istanbuljs/nyc-config-typescript",
-    "all": true,
     "check-coverage": true
 }
