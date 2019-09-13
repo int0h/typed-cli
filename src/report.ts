@@ -1,14 +1,5 @@
 import {BaseWarning, BaseError} from './errors';
 
-// type ReportItem = {
-//     issue: IssueType;
-//     children: ReportItem[];
-// }
-
-// export class Report {
-
-// }
-
 export type Issue = (Error | BaseWarning | null);
 
 export type Report = {
@@ -50,41 +41,3 @@ export function mergeReports(conclusion: Issue, ...reports: Report[]): Report {
     res.issue = isValid ? null : conclusion;
     return res;
 }
-
-// class Report {
-//     issue: Error | BaseWarning;
-//     children: Report[] = [];
-
-//     constructor(issue: Error | BaseWarning) {
-
-//     }
-// }
-
-// export function reportIssue(err: IssueType): Report {
-//     return {
-//         issue: err,
-//         children: []
-//     };
-// }
-
-// export class Report {
-//     issues: IssueType[] = [];
-//     children: Report[] = [];
-
-//     constructor(issues: IssueType[] = []) {
-//         this.addIssues(issues);
-//     }
-
-//     addIssues(issues: IssueType[]) {
-//         this.issues = [...this.issues, ...issues];
-//     }
-
-//     addChild(childReport: Report) {
-//         this.children.push(childReport);
-//     }
-
-//     validate(): boolean {
-//         return this.issues.every(issue => !(issue instanceof Error))
-//             && this.children.every(child => child.validate());
-//     }
-// }
