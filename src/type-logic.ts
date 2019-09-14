@@ -24,7 +24,7 @@ type ResolveOptionSet<O extends OptionSet> = {
 }
 
 export type CliDeclaration = {
-    command?: string;
+    name?: string;
     options?: OptionSet;
     description?: string;
     _?: Option<Types, boolean, boolean, any>;

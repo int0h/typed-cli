@@ -113,7 +113,7 @@ export class Printer {
         }
 
         return [
-            config.command && d.command(config.command),
+            config.name && d.command(config.name),
             requiredOpts,
             optionalOpts.length > 0 && ('[' + optionalOpts + ']'),
             argText

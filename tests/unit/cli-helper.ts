@@ -46,7 +46,7 @@ test('createCliHelper', t => {
             argv = '--help';
             flush();
             cli({
-                command: 'test-cmd',
+                name: 'test-cmd',
                 description: 'description',
                 options: {
                     foo: option('int')
@@ -64,7 +64,7 @@ test('createCliHelper', t => {
         argv = '--foo 1'
         flush();
         const data = cli({
-            command: 'test-cmd',
+            name: 'test-cmd',
             description: 'description',
             options: {
                 foo: option('int')
@@ -88,7 +88,7 @@ test('createCliHelper', t => {
             argv = '--foo wrong';
             flush();
             cli({
-                command: 'test-cmd',
+                name: 'test-cmd',
                 description: 'description',
                 options: {
                     foo: option('int')
@@ -136,7 +136,7 @@ test('createCliHelper:noHelpGeneration', t => {
         argv = '--help';
         flush();
         cli({
-            command: 'test-cmd',
+            name: 'test-cmd',
             description: 'description',
             options: {
                 foo: option('int')

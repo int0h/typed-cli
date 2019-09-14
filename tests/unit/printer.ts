@@ -29,7 +29,7 @@ Options
 test('printer:genHelp', t => {
     const printer = new Printer(en_US, plain);
     const helpText = printer.generateHelp({
-        command: 'test-cmd',
+        name: 'test-cmd',
         description: 'description',
         options: {
             boolean: option('boolean').alias('b'),
@@ -64,7 +64,7 @@ test('printer:noOpts', t => {
     ].join('\n');
     const printer = new Printer(en_US, plain);
     const helpText = printer.generateHelp({
-        command: 'test-cmd',
+        name: 'test-cmd',
         description: 'description',
     });
 
@@ -83,7 +83,7 @@ test('printer:args:multiple', t => {
     ].join('\n');
     const printer = new Printer(en_US, plain);
     const helpText = printer.generateHelp({
-        command: 'test-cmd',
+        name: 'test-cmd',
         description: 'description',
         _: option('int').array()
     });
@@ -103,7 +103,7 @@ test('printer:args:optional', t => {
     ].join('\n');
     const printer = new Printer(en_US, plain);
     const helpText = printer.generateHelp({
-        command: 'test-cmd',
+        name: 'test-cmd',
         description: 'description',
         _: option('int')
     });
@@ -123,7 +123,7 @@ test('printer:args:required', t => {
     ].join('\n');
     const printer = new Printer(en_US, plain);
     const helpText = printer.generateHelp({
-        command: 'test-cmd',
+        name: 'test-cmd',
         description: 'description',
         _: option('int').required()
     });
