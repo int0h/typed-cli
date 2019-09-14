@@ -1,4 +1,4 @@
-import {Validator, Preprocessor, makeValidator, BooleanValidator} from './pipeline';
+import { Validator, Preprocessor, makeValidator, BooleanValidator } from './pipeline';
 import { allIssues } from './errors';
 
 type TypeMap = {

@@ -1,6 +1,6 @@
 import url from 'url';
 
-import {option} from '../';
+import { option } from '../';
 
 const urlOption = option('string')
     .label('url')

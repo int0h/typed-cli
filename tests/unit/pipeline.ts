@@ -1,7 +1,7 @@
 import test from 'tape';
 
-import {option, getOptData} from '../../src/option';
-import {handleAllOptions, handleOption} from '../../src/pipeline';
+import { option, getOptData } from '../../src/option';
+import { handleAllOptions, handleOption } from '../../src/pipeline';
 import { isError, Report } from '../../src/report';
 import { IssueType, allIssues } from '../../src/errors';
 

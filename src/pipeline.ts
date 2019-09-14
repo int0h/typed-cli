@@ -1,5 +1,5 @@
-import {Report, Issue, combineIssues, isError} from './report';
-import {allIssues} from './errors';
+import { Report, Issue, combineIssues, isError } from './report';
+import { allIssues } from './errors';
 
 export type Validator<T> = (value: T) => void;
 

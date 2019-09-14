@@ -1,5 +1,5 @@
-import {allIssues} from './errors';
-import {TextDecorator} from './decorator';
+import { allIssues } from './errors';
+import { TextDecorator } from './decorator';
 import { Issue } from './report';
 
 export type LocaleFn = (decorator: TextDecorator) => string;

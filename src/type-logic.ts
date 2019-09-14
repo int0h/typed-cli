@@ -1,4 +1,4 @@
-import {Option, OptionSet, Types} from './option';
+import { Option, OptionSet, Types } from './option';
 
 export type GetPropertiyNames<T extends Record<string, unknown>, P> = {
     [K in keyof T]: T[K] extends P ? K : never;

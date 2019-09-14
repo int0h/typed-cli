@@ -1,7 +1,7 @@
-import {Locale} from './i18n';
-import {TextDecorator} from './decorator';
-import {Report, isError} from './report';
-import {CliDeclaration} from './type-logic';
+import { Locale } from './i18n';
+import { TextDecorator } from './decorator';
+import { Report, isError } from './report';
+import { CliDeclaration } from './type-logic';
 import { getOptData, Option } from './option';
 import { alignTextMatrix, arrayPartition, tabText } from './utils';
 import { BaseError, BaseWarning } from './errors';
@@ -152,7 +152,7 @@ export class Printer {
 
         return textAbstracts
             .join('\n\n')
-            .replace(/[\ \t]+\n/g, '\n');
+            .replace(/[ \t]+\n/g, '\n');
     }
 
     private printReportLayer(report: Report, level: number): string {

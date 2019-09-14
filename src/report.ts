@@ -1,4 +1,4 @@
-import {BaseWarning, BaseError} from './errors';
+import { BaseWarning, BaseError } from './errors';
 
 export type Issue = (Error | BaseWarning | null);
 

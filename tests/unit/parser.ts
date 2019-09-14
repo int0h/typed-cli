@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import {Parser, option} from '../..';
+import { Parser, option } from '../..';
 import { validateReport } from './pipeline';
 import { allIssues } from '../../src/errors';
 import { isError } from '../../src/report';

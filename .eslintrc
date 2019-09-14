@@ -1,6 +1,7 @@
 {
     "parser": "@typescript-eslint/parser",
     "extends": [
+        "eslint:recommended",
         "plugin:@typescript-eslint/recommended"
     ],
     "parserOptions": {
@@ -13,18 +14,25 @@
             "files": ["*.ts", "*.tsx"],
             "excludedFiles": ["*.d.ts", "*.js"],
             "rules": {
-                "@typescript-eslint/no-explicit-any": ["off"],
-                "@typescript-eslint/camelcase": ["off"],
-                "@typescript-eslint/no-use-before-define": ["off"]
+                "@typescript-eslint/no-explicit-any": "off",
+                "@typescript-eslint/camelcase": "off",
+                "@typescript-eslint/no-use-before-define": "off",
+                "no-undef": "off",
+                "no-dupe-class-members": "off"
             }
         },
         {
             "files": ["tests/**"],
             "rules": {
-                "@typescript-eslint/no-non-null-assertion": ["off"],
-                "@typescript-eslint/no-explicit-any": ["off"],
-                "@typescript-eslint/camelcase": ["off"],
-                "@typescript-eslint/no-use-before-define": ["off"]
+                "@typescript-eslint/no-non-null-assertion": "off",
+                "no-useless-escape": "off",
+
+                "@typescript-eslint/no-explicit-any": "off",
+                "@typescript-eslint/camelcase": "off",
+                "@typescript-eslint/no-use-before-define": "off",
+                "no-undef": "off",
+                "no-dupe-class-members": "off",
+                "no-empty": "off"
             }
         }
     ]

@@ -1,5 +1,5 @@
-import {Parser} from './parser';
-import {Printer} from './printer';
+import { Parser } from './parser';
+import { Printer } from './printer';
 import { CliDeclaration, ResolveCliDeclaration } from './type-logic';
 import { isError } from './report';
 

@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import {createCliHelper} from '../../src/cli-helper';
+import { createCliHelper } from '../../src/cli-helper';
 import { en_US } from '../../src/i18n';
 import { plain } from '../../src/decorator';
 import { Printer } from '../../src/printer';

@@ -1,4 +1,4 @@
-import {createCliHelper, ArgvProvider, Exiter, Writer} from './cli-helper';
+import { createCliHelper, ArgvProvider, Exiter, Writer } from './cli-helper';
 import { Printer } from './printer';
 import { en_US } from './i18n';
 import { fancy } from './decorator';

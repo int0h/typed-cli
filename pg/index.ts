@@ -1,5 +1,5 @@
 /* eslint-disable */
-import {cli, option} from '../';
+import { cli, option } from '../';
 import urlOption from '../presets/url';
 // import { en_US } from '../src/i18n';
 // import { plain, fancy } from '../src/decorator';
