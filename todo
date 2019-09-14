@@ -7,8 +7,10 @@
 + locale
 + linter
 + cli helper
-- commands
++ commands
+- commands - tests
 - bash complition
+- enumType
 - position arguments
 - descriptions as functions
 - markdown in descriptions?

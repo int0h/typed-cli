@@ -20,6 +20,9 @@ export const plain = __definePlainTextDecorator({
     errorLine: s => s,
     warningLine: s => s,
     invalidValue: s => s,
+    commandPath: s => s,
+    commandEnding: s => s,
+    commandDescription: s => s,
 });
 
 export type TextDecorator = typeof plain;
@@ -41,6 +44,9 @@ export const fancy = defineTextDecorator({
     errorLine: s => '❌  ' + s,
     warningLine: s => '⚠️  ' + s,
     invalidValue: s => chalk.redBright(s),
+    commandPath: s => chalk.dim(s),
+    commandEnding: s => chalk.blueBright(s),
+    commandDescription: s => chalk.reset(s),
 });
 
 export const decorators = {fancy, plain};

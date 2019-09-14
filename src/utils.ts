@@ -13,13 +13,18 @@ export function objMap<T, R>(obj: Record<string, T>, fn: (item: T) => R): Record
     return res;
 }
 
-export function alignTextMatrix(textMatrix: string[][]): string[][] {
+export function alignTextMatrix(textMatrix: string[][], alignment?: ('left' | 'right')[]): string[][] {
     const colSizes: number[] = [];
     textMatrix.forEach(line => {
         line.forEach((text, index) => colSizes[index] = Math.max(colSizes[index] || 0, text.length));
     });
     return textMatrix.map(line => {
-        return line.map((text, index) => text.padEnd(colSizes[index], ' '));
+        return line.map((text, index) => {
+            const align = alignment && alignment[index] || 'left';
+            return align === 'left'
+                ? text.padEnd(colSizes[index], ' ')
+                : text.padStart(colSizes[index], ' ');
+        });
     });
 }
 
@@ -34,4 +39,15 @@ export function tabText(text: string, prefix: string): string {
     return text.split('\n')
         .map(line => prefix + line)
         .join('\n');
+}
+
+export function findKeyCollision(keys: string[]): string | null {
+    const usedKeys = new Set<string>();
+    for (const key of keys) {
+        if (usedKeys.has(key)) {
+            return key;
+        }
+        usedKeys.add(key);
+    }
+    return null;
 }

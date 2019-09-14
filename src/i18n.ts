@@ -2,7 +2,7 @@ import { allIssues } from './errors';
 import { TextDecorator } from './decorator';
 import { Issue } from './report';
 
-export type LocaleFn = (decorator: TextDecorator) => string;
+export type LocaleFn = (decorator: TextDecorator, data?: any) => string;
 
 export type IssueLocaleFn = (decorator: TextDecorator, issue: Issue) => string;
 
@@ -21,6 +21,8 @@ export const en_US = {
         title_description: d => d.title('Description'),
         title_usage: d => d.title('Usage'),
         title_options: d => d.title('Options'),
+        title_commands: d => d.title('Commands'),
+        hint_commandHint: (d, {command} = {}) => `Type ${d.command(command)} <command> --help for detailed documentation`,
         opt_required: d => 'required',
         opt_optional: d => 'optional',
         opt_multile: d => 'multiple',

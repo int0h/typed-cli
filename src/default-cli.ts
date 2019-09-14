@@ -2,6 +2,8 @@ import { createCliHelper, ArgvProvider, Exiter, Writer } from './cli-helper';
 import { Printer } from './printer';
 import { en_US } from './i18n';
 import { fancy } from './decorator';
+import { createCommandHelper } from './command';
+import { CliDeclaration, ResolveCliDeclaration } from './type-logic';
 
 export const defaultPrinter = new Printer(en_US, fancy);
 
@@ -17,10 +19,24 @@ export const defaultWriter: Writer = (text, logType) => {
     }
 };
 
-export const cli = createCliHelper({
+const cliHelper = createCliHelper({
     printer: defaultPrinter,
     argvProvider: defaultArgvProvider,
     exiter: defaultExiter,
     writer: defaultWriter,
     helpGeneration: true
 });
+
+export const setupCommands = createCommandHelper({
+    printer: defaultPrinter,
+    argvProvider: defaultArgvProvider,
+    exiter: defaultExiter,
+    writer: defaultWriter,
+    helpGeneration: true
+});
+
+export function cli<D extends CliDeclaration>(decl: D): ResolveCliDeclaration<D> {
+    return cliHelper(decl);
+}
+
+cli.commands = setupCommands;
