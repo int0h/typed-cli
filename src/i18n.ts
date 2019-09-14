@@ -43,3 +43,5 @@ export type Locale = typeof en_US;
 export function declareLocale(locale: Locale): Locale {
     return locale;
 }
+
+export const locales = {en_US};

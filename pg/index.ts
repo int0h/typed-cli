@@ -1,10 +1,10 @@
 /* eslint-disable */
-import {Parser, Printer, option} from '../';
+import {cli, option} from '../';
 import urlOption from '../presets/url';
-import { en_US } from '../src/i18n';
-import { plain, fancy } from '../src/decorator';
+// import { en_US } from '../src/i18n';
+// import { plain, fancy } from '../src/decorator';
 
-const parser = new Parser({
+const data = cli({
     command: 'tasker',
     description: `Blah blah`,
     options: {
@@ -18,9 +18,9 @@ const parser = new Parser({
     _: option('number')
 });
 
-const printer = new Printer(en_US, fancy);
+// const printer = new Printer(en_US, fancy);
 
-const {data, report} = parser.parse('-p --sad')
+// const {data, report} = parser.parse('-p --sad')
 // const rep = printer.generateHelp(parser.decl);
 // console.error(rep);
 console.log('Ok');

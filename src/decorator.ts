@@ -42,3 +42,5 @@ export const fancy = defineTextDecorator({
     warningLine: s => '⚠️  ' + s,
     invalidValue: s => chalk.redBright(s),
 });
+
+export const decorators = {fancy, plain};

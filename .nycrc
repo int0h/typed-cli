@@ -6,7 +6,8 @@
     "exclude": [
         "tests/*",
         "src/i18n.*",
-        "src/decorator.*"
+        "src/decorator.*",
+        "src/default-cli.*"
     ],
     "extends": "@istanbuljs/nyc-config-typescript",
     "check-coverage": true

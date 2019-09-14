@@ -187,10 +187,8 @@ export class Printer {
     }
 
     stringifyReport(report: Report): string {
-        return isError(report.issue)
-            ? report.children
-                .map(child => this.printReportLayer(child, 0))
-                .join('\n')
-            : '';
+        return report.children
+            .map(child => this.printReportLayer(child, 0))
+            .join('\n');
     }
 }

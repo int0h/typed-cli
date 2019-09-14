@@ -98,7 +98,7 @@ export class Parser<D extends CliDeclaration> {
             }
             return {data: value, report};
         }
-        return {data: null, report: {issue: null, children: []}};
+        return {data: undefined, report: {issue: null, children: []}};
     }
 
     parse(argv: string[] | string): {report: Report; data: ResolveCliDeclaration<D> | null} {
