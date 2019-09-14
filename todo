@@ -6,7 +6,7 @@
 + maximize test coverage
 + locale
 + linter
-- cli helper
++ cli helper
 - commands
 - bash complition
 - position arguments
