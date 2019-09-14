@@ -2,14 +2,14 @@
 + tests
 + fix string validation for number-like strings
 + define custom types
-* refactoring
++ refactoring
 + maximize test coverage
-- commands
-- position arguments
-- bash complition
 + locale
-- option deprication?
++ linter
 - cli helper
+- commands
+- bash complition
+- position arguments
 - descriptions as functions
 - markdown in descriptions?
-+ linter
+- option deprication?
