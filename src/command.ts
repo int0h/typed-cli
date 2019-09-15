@@ -10,54 +10,61 @@ export type CommandSet = Record<string, CommandBuilder<CliDeclaration>>;
 
 export type CommandHandler<D extends CliDeclaration> = (data: ResolveCliDeclaration<D>) => void;
 
+export const _decl = Symbol('decl');
+export const _subCommandSet = Symbol('subCommandSet');
+const _fn = Symbol('fn');
+const _aliases = Symbol('aliases');
+const _clone = Symbol('clone');
+const _match = Symbol('match');
+
 export class CommandBuilder<D extends CliDeclaration> {
-    decl: D;
-    fn!: CommandHandler<D>;
-    aliases: string[] = [];
-    subCommandSet: CommandSet = {};
+    [_decl]: D;
+    [_fn]: CommandHandler<D>;
+    [_aliases]: string[] = [];
+    [_subCommandSet]: CommandSet = {};
 
     constructor(decl: D) {
-        this.decl = decl;
+        this[_decl] = decl;
     }
 
-    clone(): CommandBuilder<D> {
-        const cl = new CommandBuilder(this.decl);
-        cl.fn = this.fn;
-        cl.aliases = this.aliases;
-        cl.subCommandSet = this.subCommandSet;
+    [_clone] = (): CommandBuilder<D> => {
+        const cl = new CommandBuilder(this[_decl]);
+        cl[_fn] = this[_fn];
+        cl[_aliases] = this[_aliases];
+        cl[_subCommandSet] = this[_subCommandSet];
         return cl;
     }
 
     handle(fn: CommandHandler<D>): CommandBuilder<D> {
-        const cl = this.clone();
-        cl.fn = fn;
+        const cl = this[_clone]();
+        cl[_fn] = fn;
         return cl;
     }
 
     alias(...aliases: string[]): CommandBuilder<D> {
-        const cl = this.clone();
-        cl.aliases = aliases;
+        const cl = this[_clone]();
+        cl[_aliases] = aliases;
         return cl;
     }
 
     subCommands(subCommandSet: Record<string, CommandBuilder<any>>): CommandBuilder<D> {
-        const cl = this.clone();
-        cl.subCommandSet = {
-            ...this.subCommandSet,
+        const cl = this[_clone]();
+        cl[_subCommandSet] = {
+            ...this[_subCommandSet],
             ...subCommandSet
         };
         return cl;
     }
 
-    match(cmdString: string): boolean {
-        return this.aliases.includes(cmdString);
+    [_match] = (cmdString: string): boolean => {
+        return this[_aliases].includes(cmdString);
     }
 }
 
 function getCommandSetAliases(cs: CommandSet): string[] {
     let res: string[] = [];
     for (const key of Object.keys(cs)) {
-        res = res.concat(cs[key].aliases);
+        res = res.concat(cs[key][_aliases]);
     }
     return res;
 }
@@ -65,20 +72,20 @@ function getCommandSetAliases(cs: CommandSet): string[] {
 function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''): C {
     const res: C = {} as C;
     for (const key of Object.keys(cs).sort()) {
-        const cmd = cs[key].clone();
-        if (!cmd.fn) {
+        const cmd = cs[key][_clone]();
+        if (!cmd[_fn]) {
             throw new Error('no handler was set for command <${key}>');
         }
-        cmd.aliases = [key, ...cmd.aliases];
+        cmd[_aliases] = [key, ...cmd[_aliases]];
         const kebab = createKebabAlias(key);
         if (kebab) {
-            cmd.aliases.push(kebab);
+            cmd[_aliases].push(kebab);
         }
-        cmd.decl = {
-            ...cmd.decl,
+        cmd[_decl] = {
+            ...cmd[_decl],
             name: namePrefix + ' ' + key
         };
-        cmd.subCommandSet = prepareCommandSet(cmd.subCommandSet, namePrefix + ' ' + key);
+        cmd[_subCommandSet] = prepareCommandSet(cmd[_subCommandSet], namePrefix + ' ' + key);
         res[key as keyof C] = cmd as any;
     }
     const allAliases = getCommandSetAliases(res);
@@ -100,7 +107,7 @@ export type ParseCommandSetParams = {
 function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], params: ParseCommandSetParams): void {
     const {onReport, onHelp} = params;
     const handledByChild = parseCommandSet({
-        cs: cmd.subCommandSet,
+        cs: cmd[_subCommandSet],
         argv: args,
         onReport,
         onHelp
@@ -112,7 +119,7 @@ function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], param
         onHelp(cmd);
         return;
     }
-    const parser = new Parser(cmd.decl);
+    const parser = new Parser(cmd[_decl]);
     const {report, data} = parser.parse(args);
     if (report.issue !== null) {
         onReport(report);
@@ -120,7 +127,7 @@ function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], param
     if (isError(report.issue)) {
         return;
     }
-    cmd.fn(data as any);
+    cmd[_fn](data as any);
     return;
 }
 
@@ -128,7 +135,7 @@ export function parseCommandSet(params: ParseCommandSetParams): boolean {
     const {cs, argv} = params;
     const [commandName, ...args] = argv;
     for (const cmd of Object.values(cs)) {
-        if (cmd.match(commandName)) {
+        if (cmd[_match](commandName)) {
             parseCommand(cmd, args, params);
             return true;
         }
@@ -165,7 +172,7 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
         };
         const argv = argvProvider() as string[] // TODO;
         const onHelp = (cmd: CommandBuilder<CliDeclaration>): void => {
-            writer(printer.generateHelp(cmd.decl), 'log');
+            writer(printer.generateHelp(cmd[_decl]), 'log');
         }
         const handled = parseCommandSet({cs, argv, onReport, onHelp});
         if (handled) {

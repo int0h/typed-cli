@@ -6,7 +6,7 @@ import { getOptData, Option } from './option';
 import { alignTextMatrix, arrayPartition, tabText } from './utils';
 import { BaseError, BaseWarning } from './errors';
 import { prepareCliDeclaration } from './parser';
-import { CommandSet, CommandHelperParams } from './command';
+import { CommandSet, CommandHelperParams, _decl, _subCommandSet } from './command';
 
 function findMinialAlias(opt: Option<any, any, any, any>): string {
     return [opt.name, ...getOptData(opt).aliases].sort((a, b) => a.length - b.length)[0];
@@ -128,14 +128,14 @@ export class Printer {
 
         let res: string[][] = [];
         for (const cmd of Object.values(cs)) {
-            const cmdParts = (cmd.decl.name as string).split(' ');
+            const cmdParts = (cmd[_decl].name as string).split(' ');
             const title = d.commandPath(cmdParts.slice(0, -1).join(' '))
                 + ' '
                 + d.commandEnding(cmdParts[cmdParts.length - 1]);
-            const desc = cmd.decl.description as string;
+            const desc = cmd[_decl].description as string;
             const descText = desc ? ('| - ' + desc) : '|';
             res.push([title, d.commandDescription(descText)]);
-            res = res.concat(this.genenrateCommandList(cmd.subCommandSet));
+            res = res.concat(this.genenrateCommandList(cmd[_subCommandSet]));
         }
 
         return res;
