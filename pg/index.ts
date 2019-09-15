@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 /* eslint-disable */
 import { cli, option } from '../';
 import urlOption from '../presets/url';
@@ -22,11 +23,14 @@ import { command } from '../src/command';
 //     }
 // });
 
-process.argv = '$ git --help'.split(' ')
+// process.argv = '$ git --help'.split(' ')
 
 cli.commands({
-    program: 'git',
-    description: 'Version control system'
+    program: 'pg',
+    description: 'Version control system',
+    completer: {
+        completeCmd: 'completion'
+    }
 }, {
     checkout:
         command({
@@ -70,5 +74,5 @@ cli.commands({
 // const {data, report} = parser.parse('-p --sad')
 // const rep = printer.generateHelp(parser.decl);
 // console.error(rep);
-console.log('Ok');
+// console.log('Ok');
 // console.log(data);

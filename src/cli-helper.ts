@@ -7,7 +7,7 @@ export type Writer = (str: string, logType: 'log' | 'error') => void;
 
 export type Exiter = (hasErrors: boolean) => void;
 
-export type ArgvProvider = () => string | string[];
+export type ArgvProvider = () => string[];
 
 export type CliHelper = <D extends CliDeclaration>(decl: D) => ResolveCliDeclaration<D>;
 

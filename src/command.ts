@@ -1,19 +1,22 @@
 import { CliDeclaration, ResolveCliDeclaration } from "./type-logic";
 import { createKebabAlias, findKeyCollision } from "./utils";
-import { Parser } from "./parser";
+import { Parser, prepareCliDeclaration } from "./parser";
 import { Writer, Exiter, ArgvProvider } from "./cli-helper";
 import { Printer } from "./printer";
 import { isError } from "util";
 import { Report } from "./report";
+import { CompleterOptions, handleCompleterOptions } from "./completer";
 
-export type CommandSet = Record<string, CommandBuilder<CliDeclaration>>;
+export const defaultCommand = Symbol('defaultCommand');
+
+export type CommandSet = Record<string, CommandBuilder<CliDeclaration>> & {[defaultCommand]?: CommandBuilder<CliDeclaration>};
 
 export type CommandHandler<D extends CliDeclaration> = (data: ResolveCliDeclaration<D>) => void;
 
 export const _decl = Symbol('decl');
 export const _subCommandSet = Symbol('subCommandSet');
 const _fn = Symbol('fn');
-const _aliases = Symbol('aliases');
+export const _aliases = Symbol('aliases');
 const _clone = Symbol('clone');
 const _match = Symbol('match');
 
@@ -81,10 +84,7 @@ function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''): C {
         if (kebab) {
             cmd[_aliases].push(kebab);
         }
-        cmd[_decl] = {
-            ...cmd[_decl],
-            name: namePrefix + ' ' + key
-        };
+        cmd[_decl] = prepareCliDeclaration(cmd[_decl]).decl;
         cmd[_subCommandSet] = prepareCommandSet(cmd[_subCommandSet], namePrefix + ' ' + key);
         res[key as keyof C] = cmd as any;
     }
@@ -102,6 +102,27 @@ export type ParseCommandSetParams = {
     argv: string[];
     onReport: (report: Report) => void;
     onHelp?: (cmd: CommandBuilder<CliDeclaration>) => void;
+}
+
+export function findMatchedCommand(argv: string[], cs: CommandSet): CommandBuilder<any> | null {
+    let matched: CommandBuilder<any> | undefined = undefined;
+
+    for (const command of Object.values(cs)) {
+        if (command[_match](argv[0])) {
+            matched = command;
+            break;
+        }
+    }
+
+    matched = matched || cs[defaultCommand];
+
+    if (!matched) {
+        return null;
+    }
+
+    const childMatch = findMatchedCommand(argv.slice(1), matched[_subCommandSet]);
+
+    return childMatch || matched;
 }
 
 function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], params: ParseCommandSetParams): void {
@@ -151,17 +172,27 @@ export type CreateCommandHelperParams = {
     helpGeneration?: boolean;
 }
 
-export const defaultCommand = Symbol('defaultCommand');
-
 export type CommandHelperParams = {
     program?: string;
     description?: string;
+    completer?: CompleterOptions | boolean;
 }
 
 export const createCommandHelper = (params: CreateCommandHelperParams) =>
     (cfg: CommandHelperParams, cs: CommandSet): void => {
         cs = prepareCommandSet(cs, cfg.program);
         const {writer, exiter, argvProvider, printer, helpGeneration} = params;
+        const argv = argvProvider();
+        if (cfg.completer) {
+            const program = cfg.program;
+            if (!program) {
+                throw new Error('program must be provided for completions');
+            }
+            handleCompleterOptions(cs, argv[0], cfg.completer, program, () => {
+                exiter(false);
+                throw new Error('exiter has failed');
+            });
+        }
         const onReport = (report: Report): void => {
             const printedReport = printer.stringifyReport(report);
             printedReport !== '' && writer(printedReport, 'error');
@@ -170,7 +201,6 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
                 throw new Error('exiter has failed');
             }
         };
-        const argv = argvProvider() as string[] // TODO;
         const onHelp = (cmd: CommandBuilder<CliDeclaration>): void => {
             writer(printer.generateHelp(cmd[_decl]), 'log');
         }

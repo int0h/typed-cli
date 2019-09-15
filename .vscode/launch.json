@@ -12,7 +12,7 @@
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ],
-            "args": ["-p", "1", "ads", "--url", "g.co/"]
+            "args": ["completion"]
         },
         {
             "type": "node",

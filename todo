@@ -9,7 +9,8 @@
 + cli helper
 + commands
 - commands - tests
-- bash complition
+- string-argv
++ bash complition
 - enumType
 - position arguments
 - descriptions as functions
