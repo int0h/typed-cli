@@ -14,7 +14,7 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "string-argv": "^0.3.1",
-    "tabtab": "git+https://github.com/mklabs/tabtab.git#8e16e476331777a33b2b04fa913644c52f63b328",
+    "tabtab": "git+https://github.com/int0h/tabtab.git#ba938481a264fcc60a21a3288b32485f28e7fcca",
     "tap-spec": "^5.0.0",
     "tape": "^4.11.0",
     "yargs-parser": "^14.0.0"
@@ -24,7 +24,6 @@
     "@types/chalk": "^2.2.0",
     "@types/node": "^12.7.4",
     "@types/string-argv": "^0.1.0",
-    "@types/tabtab": "^3.0.0",
     "@types/tape": "^4.2.33",
     "@types/yargs-parser": "^13.1.0",
     "@typescript-eslint/eslint-plugin": "^2.2.0",

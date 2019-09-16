@@ -28,9 +28,7 @@ import { command } from '../src/command';
 cli.commands({
     program: 'pg',
     description: 'Version control system',
-    completer: {
-        completeCmd: 'completion'
-    }
+    completer: true
 }, {
     checkout:
         command({

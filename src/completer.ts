@@ -109,7 +109,7 @@ export function completeForCommandSet(cs: CommandSet, argv: string[], typedText:
 }
 
 export function tabtabCommandDeclComplete(cs: CommandSet): void {
-    const env = tabtab.parseEnv(process.env as any);
+    const env = tabtab.parseEnv(process.env);
     const line = env.last.length > 0
         ? env.line.slice(0, -env.last.length)
         : env.line;
@@ -147,7 +147,8 @@ export function handleCompleterOptions(cs: CommandSet, cmd: string, opts: Comple
         tabtab
             .install({
                 name: name,
-                completer: name
+                completer: name,
+                completeCmd: completerOpts.completeCmd
             })
             .catch(err => console.error('INSTALL ERROR', err))
             .then(() => cb());
