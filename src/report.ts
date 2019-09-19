@@ -1,4 +1,4 @@
-import { BaseWarning, BaseError } from './errors';
+import { BaseWarning, BaseError, allIssues } from './errors';
 
 export type Issue = (Error | BaseWarning | null);
 
@@ -40,4 +40,14 @@ export function mergeReports(conclusion: Issue, ...reports: Report[]): Report {
     }
     res.issue = isValid ? null : conclusion;
     return res;
+}
+
+export function errorToReport(err: Error): Report {
+    return {
+        issue: new allIssues.IvalidInputError(),
+        children: [{
+            issue: err,
+            children: []
+        }]
+    };
 }

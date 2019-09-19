@@ -4,12 +4,13 @@ import { Parser, prepareCliDeclaration } from "./parser";
 import { Writer, Exiter, ArgvProvider } from "./cli-helper";
 import { Printer } from "./printer";
 import { isError } from "util";
-import { Report } from "./report";
+import { Report, errorToReport } from "./report";
 import { CompleterOptions, handleCompleterOptions } from "./completer";
+import { allIssues } from "./errors";
 
 export const defaultCommand = Symbol('defaultCommand');
 
-export type CommandSet = Record<string, CommandBuilder<CliDeclaration>> & {[defaultCommand]?: CommandBuilder<CliDeclaration>};
+export type CommandSet = Record<string, CommandBuilder<any>> & {[defaultCommand]?: CommandBuilder<any>};
 
 export type CommandHandler<D extends CliDeclaration> = (data: ResolveCliDeclaration<D>) => void;
 
@@ -72,7 +73,7 @@ function getCommandSetAliases(cs: CommandSet): string[] {
     return res;
 }
 
-function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''): C {
+export function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''): C {
     const res: C = {} as C;
     for (const key of Object.keys(cs).sort()) {
         const cmd = cs[key][_clone]();
@@ -84,7 +85,10 @@ function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''): C {
         if (kebab) {
             cmd[_aliases].push(kebab);
         }
-        cmd[_decl] = prepareCliDeclaration(cmd[_decl]).decl;
+        cmd[_decl] = {
+            ...prepareCliDeclaration(cmd[_decl]).decl,
+            name: namePrefix + ' ' + key
+        };
         cmd[_subCommandSet] = prepareCommandSet(cmd[_subCommandSet], namePrefix + ' ' + key);
         res[key as keyof C] = cmd as any;
     }
@@ -186,7 +190,7 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
         if (cfg.completer) {
             const program = cfg.program;
             if (!program) {
-                throw new Error('program must be provided for completions');
+                throw new Error('program name must be provided for completions');
             }
             handleCompleterOptions(cs, argv[0], cfg.completer, program, () => {
                 exiter(false);
@@ -210,11 +214,22 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
         }
         if (helpGeneration && argv.includes('--help')) {
             writer(printer.generateHelpForComands(cfg, cs), 'log');
+            exiter(false);
+            throw new Error('exiter has failed');
         }
+
         const defCmd = cs[defaultCommand as unknown as keyof CommandSet];
-        if (defCmd) {
-            parseCommand(defCmd, argv, {cs, argv, onReport, onHelp});
+        const firstCommand = argv[0];
+        const hasCommand = firstCommand && /^[^-]/.test(firstCommand);
+        if (!hasCommand) {
+            if (defCmd) {
+                parseCommand(defCmd, argv, {cs, argv, onReport, onHelp});
+            } else {
+                onReport(errorToReport(new allIssues.NoCommand()));
+            }
         }
+
+        onReport(errorToReport(new allIssues.InvalidCommand(firstCommand)));
 }
 
 export function command<D extends CliDeclaration>(decl: D): CommandBuilder<D> {

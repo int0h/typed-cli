@@ -1,5 +1,7 @@
 import chalk from 'chalk';
 
+export {chalk as chalkInstance};
+
 type DecoratorFn = (text: string) => string;
 
 /** for TS only */

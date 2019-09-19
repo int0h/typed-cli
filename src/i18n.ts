@@ -36,6 +36,8 @@ export const en_US = {
         TypeMismatchError: (e, d) => `expected <${e.expected}>, but received <${d.invalidValue(e.received)}>`,
         IvalidSomeArguemntsError: (e, d) => `some of the arguments are invalid`,
         IvalidArguemntError: (e, d) => `provided argument value <${d.invalidValue(e.value)}> is not valid`,
+        InvalidCommand: (e, d) => `command <${d.invalidValue(e.commandName)}> is not supported`,
+        NoCommand: (e, d) => `no command was provided and no default command was set`
     } as IssueLocale
 };
 /* eslint-enable @typescript-eslint/no-unused-vars */

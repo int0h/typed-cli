@@ -55,6 +55,19 @@ class IvalidArguemntError extends BaseError {
     }
 }
 
+class InvalidCommand extends BaseError {
+    className = 'InvalidCommand' as const;
+    commandName: any;
+    constructor(commandName: any) {
+        super();
+        this.commandName = commandName;
+    }
+}
+
+class NoCommand extends BaseError {
+    className = 'NoCommand' as const;
+}
+
 class IvalidInputError extends BaseError {
     className = 'IvalidInputError' as const;
 }
@@ -80,6 +93,8 @@ export const allIssues = {
     IvalidArguemntError,
     SomeIvalidOptionsError,
     IvalidInputError,
-    TypeMismatchError
+    TypeMismatchError,
+    InvalidCommand,
+    NoCommand
 }
 

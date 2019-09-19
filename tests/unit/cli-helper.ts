@@ -19,7 +19,7 @@ test('createCliHelper', t => {
         log.log = '';
     }
 
-    const printer = new Printer(en_US, plain);
+    const printer = new Printer({locale: en_US, decorator: plain});
 
     const cli = createCliHelper({
         argvProvider: () => argv.split(' '),
@@ -118,7 +118,7 @@ test('createCliHelper:noHelpGeneration', t => {
         log.log = '';
     }
 
-    const printer = new Printer(en_US, plain);
+    const printer = new Printer({locale: en_US, decorator: plain});
 
     const cli = createCliHelper({
         argvProvider: () => argv.split(' '),

@@ -27,7 +27,7 @@ Options
     --desc                       <any>      [optional]  - option desc`;
 
 test('printer:genHelp', t => {
-    const printer = new Printer(en_US, plain);
+    const printer = new Printer({locale: en_US, decorator: plain});
     const helpText = printer.generateHelp({
         name: 'test-cmd',
         description: 'description',
@@ -62,7 +62,7 @@ test('printer:noOpts', t => {
         'Usage',
         '    test-cmd'
     ].join('\n');
-    const printer = new Printer(en_US, plain);
+    const printer = new Printer({locale: en_US, decorator: plain});
     const helpText = printer.generateHelp({
         name: 'test-cmd',
         description: 'description',
@@ -81,7 +81,7 @@ test('printer:args:multiple', t => {
         'Usage',
         '    test-cmd [<int> <int> ...]'
     ].join('\n');
-    const printer = new Printer(en_US, plain);
+    const printer = new Printer({locale: en_US, decorator: plain});
     const helpText = printer.generateHelp({
         name: 'test-cmd',
         description: 'description',
@@ -101,7 +101,7 @@ test('printer:args:optional', t => {
         'Usage',
         '    test-cmd [<int>]'
     ].join('\n');
-    const printer = new Printer(en_US, plain);
+    const printer = new Printer({locale: en_US, decorator: plain});
     const helpText = printer.generateHelp({
         name: 'test-cmd',
         description: 'description',
@@ -121,7 +121,7 @@ test('printer:args:required', t => {
         'Usage',
         '    test-cmd <int>'
     ].join('\n');
-    const printer = new Printer(en_US, plain);
+    const printer = new Printer({locale: en_US, decorator: plain});
     const helpText = printer.generateHelp({
         name: 'test-cmd',
         description: 'description',
@@ -149,7 +149,7 @@ option <stringOpt> is invalid
 option <invalid> is not supported`;
 
 test('printer:stringifyReport:basic types', t => {
-    const printer = new Printer(en_US, plain);
+    const printer = new Printer({locale: en_US, decorator: plain});
 
     const parser = new Parser({
         options: {
@@ -189,7 +189,7 @@ test('printer:stringifyReport:basic types', t => {
 });
 
 test('printer:stringifyReport:valid report', t => {
-    const printer = new Printer(en_US, plain);
+    const printer = new Printer({locale: en_US, decorator: plain});
 
     const parser = new Parser({
         options: {

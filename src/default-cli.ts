@@ -5,7 +5,7 @@ import { fancy } from './decorator';
 import { createCommandHelper } from './command';
 import { CliDeclaration, ResolveCliDeclaration } from './type-logic';
 
-export const defaultPrinter = new Printer(en_US, fancy);
+export const defaultPrinter = new Printer({locale: en_US, decorator: fancy});
 
 export const defaultArgvProvider: ArgvProvider = () => process.argv.slice(2);
 

@@ -12,13 +12,21 @@ function findMinialAlias(opt: Option<any, any, any, any>): string {
     return [opt.name, ...getOptData(opt).aliases].sort((a, b) => a.length - b.length)[0];
 }
 
+type PrinterParams = {
+    locale: Locale;
+    decorator: TextDecorator;
+    lineEnding?: string;
+}
+
 export class Printer {
     private locale: Locale;
     private decorator: TextDecorator;
+    private lineEnding: string;
 
-    constructor (locale: Locale, decorator: TextDecorator) {
+    constructor ({locale, decorator, lineEnding}: PrinterParams) {
         this.locale = locale;
         this.decorator = decorator;
+        this.lineEnding = lineEnding || '\n';
     }
 
     private generateOptionDescription(config: Required<CliDeclaration>): string | undefined {
@@ -166,7 +174,8 @@ export class Printer {
 
         return textAbstracts
             .join('\n\n')
-            .replace(/[ \t]+\n/g, '\n');
+            .replace(/[ \t]+\n/g, '\n')
+            .replace(/\n/g, this.lineEnding);
 
     }
 
@@ -200,7 +209,8 @@ export class Printer {
 
         return textAbstracts
             .join('\n\n')
-            .replace(/[ \t]+\n/g, '\n');
+            .replace(/[ \t]+\n/g, '\n')
+            .replace(/\n/g, this.lineEnding);
     }
 
     private printReportLayer(report: Report, level: number): string {
@@ -237,6 +247,7 @@ export class Printer {
     stringifyReport(report: Report): string {
         return report.children
             .map(child => this.printReportLayer(child, 0))
-            .join('\n');
+            .join('\n')
+            .replace(/\n/g, this.lineEnding);
     }
 }
