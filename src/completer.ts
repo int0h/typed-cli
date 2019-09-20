@@ -1,4 +1,4 @@
-import { CommandSet, findMatchedCommand, _decl, _aliases, _subCommandSet } from './command';
+import { CommandSet, findMatchedCommand, _decl, _aliases, _subCommandSet, defaultCommand } from './command';
 import { CliDeclaration } from './type-logic';
 import yargsParser from 'yargs-parser';
 import { objMap } from './utils';
@@ -30,7 +30,7 @@ function genOptionMap(decl: CliDeclaration): Record<string, OptData<any>> {
     return res;
 }
 
-function completeForCliDecl(decl: CliDeclaration, argv: string[], typedText: string): Completion[] {
+export function completeForCliDecl(decl: CliDeclaration, argv: string[], typedText: string): Completion[] {
     const parsed = yargsParser(argv, {
         alias: decl.options && objMap(decl.options, item => getOptData(item).aliases)
     });
@@ -38,7 +38,7 @@ function completeForCliDecl(decl: CliDeclaration, argv: string[], typedText: str
     const optionMap = genOptionMap(decl);
 
     // option value
-    if (lastCmd.startsWith('-')) {
+    if (lastCmd && lastCmd.startsWith('-')) {
         const optName = lastCmd.startsWith('--')
             ? lastCmd.slice(2) // removes '--'
             : lastCmd.slice(1); // removes '-'
@@ -98,7 +98,7 @@ function completeCommands(cs: CommandSet, typedText: string): Completion[] {
 
 export function completeForCommandSet(cs: CommandSet, argv: string[], typedText: string): Completion[] {
     const matchedCommand = findMatchedCommand(argv, cs);
-    if (!matchedCommand) {
+    if (!matchedCommand || matchedCommand === cs[defaultCommand]) {
         return completeCommands(cs, typedText);
     }
     const decl = matchedCommand[_decl];

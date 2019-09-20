@@ -6,4 +6,4 @@ export {cli, defaultArgvProvider, defaultExiter, defaultPrinter, defaultWriter} 
 export {decorators, chalkInstance} from './src/decorator';
 export {locales} from './src/i18n';
 export {completeForCommandSet} from './src/completer';
-export {createCommandHelper, command} from './src/command';
+export {createCommandHelper, command, defaultCommand} from './src/command';

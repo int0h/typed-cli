@@ -92,6 +92,18 @@ export function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''):
         cmd[_subCommandSet] = prepareCommandSet(cmd[_subCommandSet], namePrefix + ' ' + key);
         res[key as keyof C] = cmd as any;
     }
+    const defCmd = cs[defaultCommand];
+    if (defCmd) {
+        const cmd = defCmd[_clone]();
+        if (!cmd[_fn]) {
+            throw new Error('no handler was set for command <${key}>');
+        }
+        cmd[_decl] = {
+            ...prepareCliDeclaration(defCmd[_decl]).decl,
+            name: namePrefix
+        };
+        res[defaultCommand] = cmd;
+    }
     const allAliases = getCommandSetAliases(res);
     const aliasCollision = findKeyCollision(allAliases);
     if (aliasCollision) {
@@ -224,8 +236,10 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
         if (!hasCommand) {
             if (defCmd) {
                 parseCommand(defCmd, argv, {cs, argv, onReport, onHelp});
+                return;
             } else {
                 onReport(errorToReport(new allIssues.NoCommand()));
+                return;
             }
         }
 
