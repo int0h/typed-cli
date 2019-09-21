@@ -1,5 +1,6 @@
 import { Validator, Preprocessor, makeValidator, BooleanValidator } from './pipeline';
 import { allIssues } from './errors';
+import { Completion } from './completer';
 
 type TypeMap = {
     number: number;
@@ -26,6 +27,8 @@ const intrinsicValidators: Partial<Record<Types, BooleanValidator<any>>> = {
 
 const optionDataKey = Symbol('__data');
 
+type OptionCompleter = (partial: string) => Completion[];
+
 export type OptData<T> = {
     name: string;
     type: Types;
@@ -39,6 +42,7 @@ export type OptData<T> = {
     validators: Validator<any>[];
     prePreprocessors: Preprocessor[];
     postPreprocessors: Preprocessor[];
+    completer?: OptionCompleter;
 };
 
 export function getOptData(opt: Option<any, any, any, any>): OptData<unknown> {
@@ -125,6 +129,12 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
     alias(...aliases: string[]): Option<T, R, A, RT> {
         return updateOptData(this, {
             aliases: this[optionDataKey].aliases.concat(aliases)
+        });
+    }
+
+    completer(completer: OptionCompleter): Option<T, R, A, RT> {
+        return updateOptData(this, {
+            completer
         });
     }
 

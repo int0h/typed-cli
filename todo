@@ -3,16 +3,14 @@
 + fix string validation for number-like strings
 + define custom types
 + refactoring
-+ maximize test coverage
 + locale
 + linter
 + cli helper
 + commands
-- commands - tests
-- string-argv
 + bash complition
-- enumType
++ enumType
 - position arguments
 - descriptions as functions
 - markdown in descriptions?
-- option deprication?
+- maximize test coverage
+? option deprication?

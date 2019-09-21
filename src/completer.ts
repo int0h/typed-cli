@@ -7,14 +7,15 @@ import {parseArgsStringToArgv} from 'string-argv';
 import * as tabtab from 'tabtab';
 // import {} from ''
 
-type Completion = {
+export type Completion = {
     completion: string;
     description: string;
 };
 
 function completeForOptionValue(option: OptData<any>, typedText: string): Completion[] {
-    // const optionData = getOptData(option);
-    // optionData
+    if (option.completer) {
+        return option.completer(typedText);
+    }
     return [];
 }
 
@@ -46,7 +47,9 @@ export function completeForCliDecl(decl: CliDeclaration, argv: string[], typedTe
         if (!option) {
             return [];
         }
-        return completeForOptionValue(option, typedText);
+        if (option.type !== 'boolean') {
+            return completeForOptionValue(option, typedText);
+        }
     }
 
     const getOptionNameCompletions = (partialName: string): Completion[] => {
