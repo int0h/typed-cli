@@ -7,3 +7,5 @@ export {decorators, chalkInstance} from './src/decorator';
 export {locales} from './src/i18n';
 export {completeForCommandSet} from './src/completer';
 export {createCommandHelper, command, defaultCommand} from './src/command';
+import * as presets from './presets';
+export {presets};

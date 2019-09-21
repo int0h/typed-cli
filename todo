@@ -9,8 +9,8 @@
 + commands
 + bash complition
 + enumType
-- position arguments
-- descriptions as functions
-- markdown in descriptions?
 - maximize test coverage
+? markdown in descriptions?
+? descriptions as functions
+? position arguments
 ? option deprication?

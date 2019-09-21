@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 /* eslint-disable */
-import { cli, option } from '../';
+import { cli, option, presets } from '../';
 import urlOption from '../presets/url';
 import { command } from '../src/command';
 // import { en_US } from '../src/i18n';
