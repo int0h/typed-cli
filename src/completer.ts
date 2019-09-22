@@ -52,15 +52,19 @@ export function completeForCliDecl(decl: CliDeclaration, argv: string[], typedTe
         }
     }
 
-    const getOptionNameCompletions = (partialName: string): Completion[] => {
+    const getOptionNameCompletions = (partialName: string, longOpt: boolean): Completion[] => {
         const availableOptions = Object.entries(optionMap)
+            // skip used opts
             .filter(([, optData]) => {
                 if (optData.isArray) {
                     return true;
                 }
                 return !parsed[optData.name];
             })
-            .filter(([key]) => key.indexOf(partialName) === 0);
+            // filter by text
+            .filter(([key]) => key.indexOf(partialName) === 0)
+            // skip shorthands if '--' is typed already
+            .filter(([key]) => key.length > 1 || !longOpt);
         return availableOptions.map(([key, optData]) => {
             const prefix = key.length > 1 ? '--' : '-';
             return {
@@ -74,11 +78,11 @@ export function completeForCliDecl(decl: CliDeclaration, argv: string[], typedTe
 
     if (typedText === '') {
         return [
-            ...getOptionNameCompletions(''),
+            ...getOptionNameCompletions('', false),
             ...getArgumentCompletions()
         ]
     } else if (typedText.startsWith('-')) {
-        return getOptionNameCompletions(typedText.replace(/^--?/, ''));
+        return getOptionNameCompletions(typedText.replace(/^--?/, ''), typedText.startsWith('--'));
     } else {
         return getArgumentCompletions();
     }

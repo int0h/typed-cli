@@ -4,10 +4,7 @@
         "index.*"
     ],
     "exclude": [
-        "tests/*",
-        "src/i18n.*",
-        "src/decorator.*",
-        "src/default-cli.*"
+        "tests/*"
     ],
     "extends": "@istanbuljs/nyc-config-typescript",
     "check-coverage": true
