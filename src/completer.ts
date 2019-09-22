@@ -130,6 +130,21 @@ export function tabtabCommandDeclComplete(cs: CommandSet): void {
     );
 }
 
+export function tabtabCliDeclComplete(decl: CliDeclaration): void {
+    const env = tabtab.parseEnv(process.env);
+    const line = env.last.length > 0
+        ? env.line.slice(0, -env.last.length)
+        : env.line;
+    const argv = parseArgsStringToArgv(line).slice(1);
+    const completions = completeForCliDecl(decl, argv, env.last);
+    tabtab.log(
+        completions.map(c => ({
+            name: c.completion,
+            description: c.description
+        }))
+    );
+}
+
 export type CompleterOptions = {
     installCmd?: string;
     uninstallCmd?: string;
@@ -145,7 +160,13 @@ export function normalizeCompleterOptions(opts: CompleterOptions): Required<Comp
     }
 }
 
-export function handleCompleterOptions(cs: CommandSet, cmd: string, opts: CompleterOptions | boolean, name: string | undefined, cb: Function): boolean {
+export function handleCompleterOptions(
+    cmd: string,
+    opts: CompleterOptions | boolean,
+    name: string | undefined,
+    onComplete: () => void,
+    exiter: (hasErrors: boolean) => void
+): boolean {
     const completerOpts = normalizeCompleterOptions(typeof opts === 'boolean' ? {} : opts);
     if (cmd === completerOpts.installCmd) {
         if (!name) {
@@ -157,8 +178,11 @@ export function handleCompleterOptions(cs: CommandSet, cmd: string, opts: Comple
                 completer: name,
                 completeCmd: completerOpts.completeCmd
             })
-            .catch(err => console.error('INSTALL ERROR', err))
-            .then(() => cb());
+            .then(() => exiter(false))
+            .catch(err => {
+                console.error('INSTALL ERROR', err);
+                exiter(true);
+            });
         return true;
     }
     if (cmd === completerOpts.uninstallCmd) {
@@ -169,12 +193,15 @@ export function handleCompleterOptions(cs: CommandSet, cmd: string, opts: Comple
             .uninstall({
                 name: name,
             })
-            .catch(err => console.error('INSTALL ERROR', err))
-            .then(() => cb());
+            .then(() => exiter(false))
+            .catch(err => {
+                console.error('UNINSTALL ERROR', err);
+                exiter(true);
+            });
             return true;
     }
     if (cmd === completerOpts.completeCmd) {
-        tabtabCommandDeclComplete(cs);
+        onComplete();
         return true;
     }
     return false;

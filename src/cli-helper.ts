@@ -1,7 +1,8 @@
-import { Parser } from './parser';
+import { Parser, prepareCliDeclaration } from './parser';
 import { Printer } from './printer';
 import { CliDeclaration, ResolveCliDeclaration } from './type-logic';
 import { isError } from './report';
+import { CompleterOptions, tabtabCliDeclComplete, normalizeCompleterOptions } from './completer';
 
 export type Writer = (str: string, logType: 'log' | 'error') => void;
 
@@ -17,13 +18,23 @@ export type CreateCliHelperParams = {
     argvProvider: ArgvProvider;
     printer: Printer;
     helpGeneration?: boolean;
+    completer?: CompleterOptions | boolean;
 }
 
 export function createCliHelper(params: CreateCliHelperParams): CliHelper {
     return <D extends CliDeclaration>(decl: D): ResolveCliDeclaration<D> => {
-        const {argvProvider, exiter, printer, writer, helpGeneration} = params;
+        const {argvProvider, exiter, printer, writer, helpGeneration, completer} = params;
+        decl = prepareCliDeclaration(decl).decl as any;
         const parser = new Parser(decl);
         const argv = argvProvider();
+        if (completer) {
+            const {completeCmd} = normalizeCompleterOptions(typeof completer === 'boolean' ? {} : completer);
+            if (argv[0] === completeCmd) {
+                tabtabCliDeclComplete(decl);
+                exiter(false);
+                throw new Error('exiter has failed');
+            }
+        }
         if (helpGeneration) {
             if (argv.includes('--help')) {
                 writer(printer.generateHelp(decl), 'log');

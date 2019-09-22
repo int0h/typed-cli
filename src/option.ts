@@ -150,7 +150,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
         }) as any;
     }
 
-    array(): Option<T, R, true, RT> {
+    array(): Option<T, true, true, RT> {
         return updateOptData(this, {
             isArray: true
         }) as any;

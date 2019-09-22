@@ -5,7 +5,7 @@ import { Writer, Exiter, ArgvProvider } from "./cli-helper";
 import { Printer } from "./printer";
 import { isError } from "util";
 import { Report, errorToReport } from "./report";
-import { CompleterOptions, handleCompleterOptions } from "./completer";
+import { CompleterOptions, handleCompleterOptions, tabtabCommandDeclComplete } from "./completer";
 import { allIssues } from "./errors";
 
 export const defaultCommand = Symbol('defaultCommand');
@@ -201,8 +201,12 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
             if (!program) {
                 throw new Error('program name must be provided for completions');
             }
-            handleCompleterOptions(cs, argv[0], cfg.completer, program, () => {
+            handleCompleterOptions(argv[0], cfg.completer, program, () => {
+                tabtabCommandDeclComplete(cs);
                 exiter(false);
+                throw new Error('exiter has failed');
+            }, (hasErrors) => {
+                exiter(hasErrors);
                 throw new Error('exiter has failed');
             });
         }

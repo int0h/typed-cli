@@ -24,7 +24,8 @@ const cliHelper = createCliHelper({
     argvProvider: defaultArgvProvider,
     exiter: defaultExiter,
     writer: defaultWriter,
-    helpGeneration: true
+    helpGeneration: true,
+    completer: true
 });
 
 export const setupCommands = createCommandHelper({
