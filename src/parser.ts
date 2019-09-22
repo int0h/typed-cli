@@ -104,7 +104,7 @@ export class Parser<D extends CliDeclaration> {
     parse(argv: string[] | string): {report: Report; data: ResolveCliDeclaration<D> | null} {
         const parsed = yargsParser(argv, {
             alias: this.decl.options && objMap(this.decl.options, item => getOptData(item).aliases),
-            boolean: Object.values(this.decl.options || {})
+            boolean: Object.values(this.decl.options as OptionSet)
                 .filter(opt => getOptData(opt).type === 'boolean')
                 .map(opt => opt.name)
         });

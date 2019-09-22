@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import { alignTextMatrix, createKebabAlias, objMap, arrayPartition, tabText } from '../../src/utils';
+import { alignTextMatrix, createKebabAlias, objMap, arrayPartition, tabText, findKeyCollision } from '../../src/utils';
 
 test('alignTextMatrix', t => {
     t.deepEqual(alignTextMatrix([
@@ -11,6 +11,14 @@ test('alignTextMatrix', t => {
         ['1    ', '123  ', '12'],
         ['     ', '12345', '1 '],
         ['12345', '12345', '  ']
+    ]);
+
+    t.deepEqual(alignTextMatrix([
+        ['a', 'aaa'],
+        ['bbb', 'b']
+    ], ['left', 'right']), [
+        ['a  ', 'aaa'],
+        ['bbb', '  b']
     ]);
     t.end();
 });
@@ -34,5 +42,11 @@ test('arrayPartition', t => {
 
 test('tabText', t => {
     t.equal(tabText('abc\ndef', '! '), '! abc\n! def');
+    t.end();
+});
+
+test('findKeyCollision', t => {
+    t.is(findKeyCollision(['a', 'b', 'a']), 'a');
+    t.is(findKeyCollision(['a', 'b']), null);
     t.end();
 });

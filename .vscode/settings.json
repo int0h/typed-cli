@@ -13,5 +13,7 @@
         "javascriptreact",
         "typescript",
         "typescriptreact"
-    ]
+    ],
+    "coverage-gutters.coverageReportFileName": "coverage/**/index.html",
+    "coverage-gutters.lcovname": "coverage/lcov.info"
 }

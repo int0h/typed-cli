@@ -15,16 +15,13 @@ test('every option type', t => {
         }
     });
 
-    const {data, report} = parser.parse('--int 12.23 --boolean asd --number qwe --string');
+    const {data, report} = parser.parse('--int 12.23 --number qwe --string');
 
     t.equal(data, null);
 
     validateReport(report, {
         issue: [allIssues.IvalidInputError, {}],
         children: [
-            {issue: [allIssues.IvalidOptionError, {optionName: 'boolean', value: 'asd'}], children: [
-                {issue: [allIssues.TypeMismatchError, {}], children: []}
-            ]},
             {issue: [allIssues.IvalidOptionError, {optionName: 'int', value: 12.23}], children: [
                 {issue: [allIssues.TypeMismatchError, {}], children: []}
             ]},

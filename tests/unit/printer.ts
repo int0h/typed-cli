@@ -136,8 +136,6 @@ test('printer:args:required', t => {
 const reportTextRef =
 `option <bar> is invalid
     - custom:error:stringify
-option <booleanOpt> is invalid
-    - expected <boolean>, but received <string>
 option <foo> is invalid
     - custom:error
 option <intOpt> is invalid
@@ -171,7 +169,6 @@ test('printer:stringifyReport:basic types', t => {
 
     const {data, report} = parser.parse([
         '--intOpt', '12.23',
-        '--booleanOpt', 'asd',
         '--numberOpt', 'qwe',
         '--stringOpt',
         '--foo', '0',

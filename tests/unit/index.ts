@@ -4,3 +4,4 @@ import './pipeline';
 import './parser';
 import './printer';
 import './cli-helper';
+import './command';

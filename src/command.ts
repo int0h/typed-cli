@@ -16,10 +16,10 @@ export type CommandHandler<D extends CliDeclaration> = (data: ResolveCliDeclarat
 
 export const _decl = Symbol('decl');
 export const _subCommandSet = Symbol('subCommandSet');
-const _fn = Symbol('fn');
+export const _fn = Symbol('fn');
 export const _aliases = Symbol('aliases');
-const _clone = Symbol('clone');
-const _match = Symbol('match');
+export const _clone = Symbol('clone');
+export const _match = Symbol('match');
 
 export class CommandBuilder<D extends CliDeclaration> {
     [_decl]: D;
@@ -158,11 +158,8 @@ function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], param
     }
     const parser = new Parser(cmd[_decl]);
     const {report, data} = parser.parse(args);
-    if (report.issue !== null) {
+    if (report.issue !== null || report.children.length > 0) {
         onReport(report);
-    }
-    if (isError(report.issue)) {
-        return;
     }
     cmd[_fn](data as any);
     return;
@@ -239,7 +236,6 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
                 return;
             } else {
                 onReport(errorToReport(new allIssues.NoCommand()));
-                return;
             }
         }
 

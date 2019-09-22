@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint . --ignore-path ./.gitignore --ext .ts",
     "test": "nyc node ./tests/unit/index.js | tap-spec",
-    "test-report": "nyc -r html node ./tests/unit/index.js | tap-spec"
+    "test-report": "nyc -r lcov node ./tests/unit/index.js | tap-spec"
   },
   "keywords": [],
   "author": "",
