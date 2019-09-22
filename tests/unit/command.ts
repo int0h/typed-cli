@@ -7,8 +7,8 @@ import { decorators } from '../../src/decorator';
 import { option } from '../../src/option';
 
 test('command helper result', t => {
-    const handleChild = () => {};
-    const handleParent = () => {};
+    const handleChild = (): void => {};
+    const handleParent = (): void => {};
     const cmd = command({
         name: 'foo',
         description: 'boo'
@@ -20,6 +20,7 @@ test('command helper result', t => {
     t.is(cmd[_decl].description, 'boo');
     t.is(cmd[_fn], handleParent);
     t.is(cmd[_subCommandSet].sub[_fn], handleChild);
+    t.deepEqual(cmd[_aliases], ['a', 'b']);
     t.end();
 });
 
@@ -41,7 +42,7 @@ test('command parsing', t => {
         exiter: (hasErrors) => exitCode = (hasErrors ? 1 : 0),
         helpGeneration: true,
         printer: new Printer({locale: locales.en_US, decorator: decorators.plain}),
-        writer: (text, logType) => out = text
+        writer: (text) => out = text
     });
 
     test('basics', t => {
