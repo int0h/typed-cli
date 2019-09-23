@@ -1,0 +1,16 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tabtab": "git+https://github.com/int0h/tabtab.git#ba938481a264fcc60a21a3288b32485f28e7fcca",
+    "typed-cli": "^0.1.1"
+  }
+}
