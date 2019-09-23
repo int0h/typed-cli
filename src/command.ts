@@ -8,6 +8,10 @@ import { Report, errorToReport } from "./report";
 import { CompleterOptions, handleCompleterOptions, tabtabCommandDeclComplete } from "./completer";
 import { allIssues } from "./errors";
 
+/**
+ * It can be used as a key in command set to set a default command.
+ * Such command will be used if no command was provided.
+ */
 export const defaultCommand = Symbol('defaultCommand');
 
 export type CommandSet = Record<string, CommandBuilder<any>> & {[defaultCommand]?: CommandBuilder<any>};
@@ -39,18 +43,39 @@ export class CommandBuilder<D extends CliDeclaration> {
         return cl;
     }
 
+    /**
+     * Sets a command handler - a function to be called
+     * if the input string matches against the command.
+     * **Important:** a handler must be provided for a command, if you don't
+     * want your program to do anything, just pass `() => {}`
+     * @param fn - a function to be called for the command
+     */
     handle(fn: CommandHandler<D>): CommandBuilder<D> {
         const cl = this[_clone]();
         cl[_fn] = fn;
         return cl;
     }
 
+    /**
+     * Adds aliases to the command
+     * @param aliases - alias list
+     */
     alias(...aliases: string[]): CommandBuilder<D> {
         const cl = this[_clone]();
         cl[_aliases] = aliases;
         return cl;
     }
 
+    /**
+     * Sets sub-command for the current command.
+     * The signature is similar to `T` in `cli.commands({}, <T>)`.
+     *
+     * `git remote add` - is a "sub-command" where:
+     * `git` - is a program,
+     * `remote` - is a command
+     * `add` - is sub-command of command `remote`
+     * @param subCommandSet - map (dictionary) of sub-commands
+     */
     subCommands(subCommandSet: Record<string, CommandBuilder<any>>): CommandBuilder<D> {
         const cl = this[_clone]();
         cl[_subCommandSet] = {
@@ -246,6 +271,10 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
         onReport(errorToReport(new allIssues.InvalidCommand(firstCommand)));
 }
 
+/**
+ * Defines a program command
+ * @param decl - command declaration, which is basicly the same as program declaration passed to `cli()`
+ */
 export function command<D extends CliDeclaration>(decl: D): CommandBuilder<D> {
     return new CommandBuilder(decl);
 }
