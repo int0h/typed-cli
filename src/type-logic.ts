@@ -1,3 +1,4 @@
+/** @hidden */
 import { Option, OptionSet, Types } from './option';
 
 export type GetPropertiyNames<T extends Record<string, unknown>, P> = {

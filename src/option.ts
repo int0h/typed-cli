@@ -10,8 +10,10 @@ type TypeMap = {
     any: number | string | boolean;
 }
 
+/** @hidden */
 export type Types = keyof TypeMap;
 
+/** @hidden */
 export type ResolveType<T extends Types> = TypeMap[T];
 
 const intrinsicPreProcessors: Partial<Record<Types, Preprocessor>> = {
@@ -29,6 +31,7 @@ const optionDataKey = Symbol('__data');
 
 type OptionCompleter = (partial: string) => Completion[];
 
+/** @hidden */
 export type OptData<T> = {
     name: string;
     type: Types;
@@ -45,14 +48,17 @@ export type OptData<T> = {
     completer?: OptionCompleter;
 };
 
+/** @hidden */
 export function getOptData(opt: Option<any, any, any, any>): OptData<unknown> {
     return opt[optionDataKey];
 }
 
+/** @hidden */
 export function setOptData(opt: Option<any, any, any, any>, data: OptData<any>): void {
     opt[optionDataKey] = data;
 }
 
+/** @hidden */
 export function cloneOption<O extends Option<any, any, any, any>>(opt: O): O {
     const oldOpt = opt;
     const oldData = getOptData(oldOpt);
@@ -61,10 +67,12 @@ export function cloneOption<O extends Option<any, any, any, any>>(opt: O): O {
     return opt;
 }
 
+/** @hidden */
 export function updateOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>): O {
     return changeOptData(cloneOption(opt), data);
 }
 
+/** @hidden */
 export function changeOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>): O {
     setOptData(opt, {
         ...getOptData(opt),
@@ -82,7 +90,9 @@ export function option<T extends Types>(type: T): Option<T, false, false, Resolv
 }
 
 export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
+    /** @hidden */
     name = '';
+    /** @hidden */
     [optionDataKey]: OptData<RT> = {
         name: '',
         type: 'any',

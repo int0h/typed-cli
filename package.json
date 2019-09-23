@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint . --ignore-path ./.gitignore --ext .ts",
     "test": "nyc node ./tests/unit/index.js | tap-spec",
-    "test-report": "nyc -r lcov node ./tests/unit/index.js | tap-spec"
+    "test-report": "nyc -r lcov node ./tests/unit/index.js | tap-spec",
+    "docs": "typedoc --out ./docs ./index.ts"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +35,7 @@
     "tap-spec": "^5.0.0",
     "tape": "^4.11.0",
     "ts-node": "^8.3.0",
+    "typedoc": "^0.15.0",
     "typescript": "^3.6.3"
   }
 }

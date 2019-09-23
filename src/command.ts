@@ -14,15 +14,23 @@ import { allIssues } from "./errors";
  */
 export const defaultCommand = Symbol('defaultCommand');
 
+/** @hidden */
 export type CommandSet = Record<string, CommandBuilder<any>> & {[defaultCommand]?: CommandBuilder<any>};
 
+/** @hidden */
 export type CommandHandler<D extends CliDeclaration> = (data: ResolveCliDeclaration<D>) => void;
 
+/** @hidden */
 export const _decl = Symbol('decl');
+/** @hidden */
 export const _subCommandSet = Symbol('subCommandSet');
+/** @hidden */
 export const _fn = Symbol('fn');
+/** @hidden */
 export const _aliases = Symbol('aliases');
+/** @hidden */
 export const _clone = Symbol('clone');
+/** @hidden */
 export const _match = Symbol('match');
 
 export class CommandBuilder<D extends CliDeclaration> {
@@ -35,6 +43,7 @@ export class CommandBuilder<D extends CliDeclaration> {
         this[_decl] = decl;
     }
 
+    /** @hidden */
     [_clone] = (): CommandBuilder<D> => {
         const cl = new CommandBuilder(this[_decl]);
         cl[_fn] = this[_fn];
@@ -85,6 +94,7 @@ export class CommandBuilder<D extends CliDeclaration> {
         return cl;
     }
 
+    /** @hidden */
     [_match] = (cmdString: string): boolean => {
         return this[_aliases].includes(cmdString);
     }
@@ -98,6 +108,7 @@ function getCommandSetAliases(cs: CommandSet): string[] {
     return res;
 }
 
+/** @hidden */
 export function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''): C {
     const res: C = {} as C;
     for (const key of Object.keys(cs).sort()) {
@@ -137,7 +148,6 @@ export function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''):
     return res;
 }
 
-// function create
 export type ParseCommandSetParams = {
     cs: CommandSet;
     argv: string[];
@@ -145,6 +155,7 @@ export type ParseCommandSetParams = {
     onHelp?: (cmd: CommandBuilder<CliDeclaration>) => void;
 }
 
+/** @hidden */
 export function findMatchedCommand(argv: string[], cs: CommandSet): CommandBuilder<any> | null {
     let matched: CommandBuilder<any> | undefined = undefined;
 
@@ -190,6 +201,7 @@ function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], param
     return;
 }
 
+/** @hidden */
 export function parseCommandSet(params: ParseCommandSetParams): boolean {
     const {cs, argv} = params;
     const [commandName, ...args] = argv;
@@ -211,11 +223,19 @@ export type CreateCommandHelperParams = {
 }
 
 export type CommandHelperParams = {
+    /** program name */
     program?: string;
+    /** program description */
     description?: string;
+    /** `true` or completer config if tab complitions wanted */
     completer?: CompleterOptions | boolean;
 }
 
+/**
+ * Creates a CommandHelper. `cli.command` - is an example of CommandHelper
+ * created with this function.
+ * @param params
+ */
 export const createCommandHelper = (params: CreateCommandHelperParams) =>
     (cfg: CommandHelperParams, cs: CommandSet): void => {
         cs = prepareCommandSet(cs, cfg.program);
