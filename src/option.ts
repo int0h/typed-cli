@@ -89,6 +89,13 @@ export function option<T extends Types>(type: T): Option<T, false, false, Resolv
     return new Option<T, false, false, ResolveType<T>>(type);
 }
 
+/**
+ * Option - is a helper class used to configure options.
+ * It's used for chained calls such as
+ * ```js
+ * ... .alias().description().default() ...
+ * ```
+ */
 export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
     /** @hidden */
     name = '';
