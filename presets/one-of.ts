@@ -60,6 +60,7 @@ const oneOf = <T extends OneOfDecl>(decl: T): Option<'string', false, false, Res
     const normDecl = normalizeDecl(decl);
     const keys = Object.keys(normDecl);
     return option.string
+        .label(keys.join('|'))
         .completer(partial => {
             return keys
                 .filter(key => key.indexOf(partial) === 0)
