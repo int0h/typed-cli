@@ -10,6 +10,7 @@
 + bash complition
 + enumType
 - maximize test coverage
+- multiline help cells & max cell width
 ? markdown in descriptions?
 ? descriptions as functions
 ? position arguments
