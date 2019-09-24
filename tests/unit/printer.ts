@@ -32,21 +32,21 @@ test('printer:genHelp', t => {
         name: 'test-cmd',
         description: 'description',
         options: {
-            boolean: option('boolean').alias('b'),
-            bigBoolean: option('boolean'),
-            z: option('boolean'),
-            w: option('boolean').required(),
-            int: option('int').alias('i'),
-            number: option('number').alias('n'),
-            string: option('string').alias('s'),
+            boolean: option.boolean.alias('b'),
+            bigBoolean: option.boolean,
+            z: option.boolean,
+            w: option.boolean.required(),
+            int: option.int.alias('i'),
+            number: option.number.alias('n'),
+            string: option.string.alias('s'),
 
-            array: option('int').array(),
-            required: option('int').required(),
-            default: option('any').default(123),
+            array: option.int.array(),
+            required: option.int.required(),
+            default: option.any.default(123),
 
-            desc: option('any').description('option desc')
+            desc: option.any.description('option desc')
         },
-        _: option('number')
+        _: option.number
     });
 
     t.equal(helpText, helpTextRef);
@@ -85,7 +85,7 @@ test('printer:args:multiple', t => {
     const helpText = printer.generateHelp({
         name: 'test-cmd',
         description: 'description',
-        _: option('int').array()
+        _: option.int.array()
     });
 
     t.equal(helpText, helpTextRef);
@@ -105,7 +105,7 @@ test('printer:args:optional', t => {
     const helpText = printer.generateHelp({
         name: 'test-cmd',
         description: 'description',
-        _: option('int')
+        _: option.int
     });
 
     t.equal(helpText, helpTextRef);
@@ -125,7 +125,7 @@ test('printer:args:required', t => {
     const helpText = printer.generateHelp({
         name: 'test-cmd',
         description: 'description',
-        _: option('int').required()
+        _: option.int.required()
     });
 
     t.equal(helpText, helpTextRef);
@@ -151,12 +151,12 @@ test('printer:stringifyReport:basic types', t => {
 
     const parser = new Parser({
         options: {
-            booleanOpt: option('boolean'),
-            intOpt: option('int'),
-            numberOpt: option('number'),
-            stringOpt: option('string'),
-            foo: option('string').validate('custom:error', () => false),
-            bar: option('string').validate(() => {
+            booleanOpt: option.boolean,
+            intOpt: option.int,
+            numberOpt: option.number,
+            stringOpt: option.string,
+            foo: option.string.validate('custom:error', () => false),
+            bar: option.string.validate(() => {
                 class CustomError extends Error {
                     stringify(): string {
                         return 'custom:error:stringify'
@@ -190,7 +190,7 @@ test('printer:stringifyReport:valid report', t => {
 
     const parser = new Parser({
         options: {
-            booleanOpt: option('boolean'),
+            booleanOpt: option.boolean,
         }
     });
 

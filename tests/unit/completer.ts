@@ -25,10 +25,10 @@ test('completeForCliDecl', t => {
         name: 'prog',
         description: 'desc',
         options: {
-            n: option('int').description('foo').array(),
-            someProp: option('string').alias('some-opt-alias').description('bar'),
+            n: option.int.description('foo').array(),
+            someProp: option.string.alias('some-opt-alias').description('bar'),
             en: oneOf(['a', 'b']).description('enum'),
-            bool: option('boolean').description('bool')
+            bool: option.boolean.description('bool')
         }
     };
     const pCli = prepareCliDeclaration(cli).decl;

@@ -4,7 +4,7 @@ import { getOptData } from '../../src/option';
 import { option } from '../../';
 
 test('option basic', t => {
-    t.deepEqual(getOptData(option('any')), {
+    t.deepEqual(getOptData(option.any), {
         name: '',
         type: 'any',
         labelName: 'any',
@@ -25,7 +25,7 @@ test('option basic', t => {
     const postFn = (): void => {};
     const valFn = (): void => {};
 
-    const opt = option('any')
+    const opt = option.any
         .alias('alias1', 'alias2')
         .array()
         .default(123)
@@ -55,7 +55,7 @@ test('option basic', t => {
 
 test('declaration validation', t => {
     t.throws(() => {
-        option('any').process('blah' as any, () => {});
+        option.any.process('blah' as any, () => {});
     });
     t.end();
 });

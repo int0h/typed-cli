@@ -5,8 +5,8 @@ const data = cli({
     name: 'calc-area',
     description: 'calculate area',
     options: {
-        width: option('number').alias('w').required().description('width of a rectangle'),
-        height: option('number').alias('h').required().description('height of a rectangle'),
+        width: option.number.alias('w').required().description('width of a rectangle'),
+        height: option.number.alias('h').required().description('height of a rectangle'),
     }
 });
 

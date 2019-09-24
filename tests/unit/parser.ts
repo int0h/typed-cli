@@ -8,10 +8,10 @@ import { isError } from '../../src/report';
 test('every option type', t => {
     const parser = new Parser({
         options: {
-            boolean: option('boolean'),
-            int: option('int'),
-            number: option('number'),
-            string: option('string'),
+            boolean: option.boolean,
+            int: option.int,
+            number: option.number,
+            string: option.string,
         }
     });
 
@@ -40,10 +40,10 @@ test('every option type', t => {
 test('parsing valid data', t => {
     const parser = new Parser({
         options: {
-            boolean: option('boolean'),
-            int: option('int'),
-            number: option('number'),
-            string: option('string'),
+            boolean: option.boolean,
+            int: option.int,
+            number: option.number,
+            string: option.string,
         }
     });
 
@@ -62,7 +62,7 @@ test('parsing valid data', t => {
 
 test('parsing ivalid arguments', t => {
     const parser = new Parser({
-        _: option('int')
+        _: option.int
     });
 
     const {data, report} = parser.parse('asd');
@@ -83,7 +83,7 @@ test('parsing ivalid arguments', t => {
 
 test('empty required argument', t => {
     const parser = new Parser({
-        _: option('int').required()
+        _: option.int.required()
     });
 
     const {data, report} = parser.parse('');
@@ -106,8 +106,8 @@ test('alias collision detection', t => {
     t.throws(() => {
         new Parser({
             options: {
-                a: option('any'),
-                b: option('any').alias('a')
+                a: option.any,
+                b: option.any.alias('a')
             }
         });
     });
@@ -115,8 +115,8 @@ test('alias collision detection', t => {
     t.throws(() => {
         new Parser({
             options: {
-                someVar: option('any'),
-                'some-var': option('any')
+                someVar: option.any,
+                'some-var': option.any
             }
         });
     }, 'kebab alias collision check');
@@ -126,7 +126,7 @@ test('alias collision detection', t => {
 
 test('passing array for non-array option', t => {
     const parser = new Parser({
-        _: option('int').required()
+        _: option.int.required()
     });
 
     const {data, report} = parser.parse('1 2 3');
@@ -147,7 +147,7 @@ test('passing array for non-array option', t => {
 
 test('parsing valid arguments', t => {
     const parser = new Parser({
-        _: option('int').array()
+        _: option.int.array()
     });
 
     const {data, report} = parser.parse('1 2 3');

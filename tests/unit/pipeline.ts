@@ -7,7 +7,7 @@ import { isError, Report } from '../../src/report';
 import { IssueType, allIssues } from '../../src/errors';
 
 test('handleOption', t => {
-    const opt = option('int')
+    const opt = option.int
         .process('pre', i => Math.abs(i))
         .validate('option is bad', i => i < 256)
         .process('post', i => i / 256)
@@ -20,13 +20,13 @@ test('handleOption', t => {
 });
 
 test('handleAllOptions', t => {
-    const opt1 = option('int')
+    const opt1 = option.int
         .process('pre', i => Math.abs(i))
         .validate('option is bad', i => i < 256)
         .process('post', i => i / 256)
         .process('post', i => i * 2 - 1);
 
-    const opt2 = option('string')
+    const opt2 = option.string
         .default('abc');
 
     const {data} = handleAllOptions({
@@ -39,7 +39,7 @@ test('handleAllOptions', t => {
 });
 
 test('handleArrayOption', t => {
-    const opt = option('int')
+    const opt = option.int
         .process('pre', i => Math.abs(i))
         .validate('option is bad', i => i < 256)
         .process('post', i => i / 255)
@@ -80,12 +80,12 @@ export function validateReport(r: Report, ref: ReportReference): void {
 }
 
 test('invalid options', t => {
-    const opt1 = option('int')
+    const opt1 = option.int
         .validate('option is bad', i => i < 256)
         .process('post', i => i / 256)
         .process('post', i => i * 2 - 1);
 
-    const opt2 = option('string')
+    const opt2 = option.string
         .default('abc');
 
     const {data, report} = handleAllOptions({
@@ -123,7 +123,7 @@ test('invalid options', t => {
 });
 
 test('handle strings containing digits only', t => {
-    const opt = option('string');
+    const opt = option.string;
 
     const res1 = handleOption(getOptData(opt), '123');
     t.deepEqual(res1.value, '123');
@@ -136,7 +136,7 @@ test('handle strings containing digits only', t => {
 });
 
 test('custom validator', t => {
-    const opt = option('string')
+    const opt = option.string
         .validate('invalid', () => false);
 
     const res = handleOption(getOptData(opt), '123');
@@ -150,7 +150,7 @@ test('custom validator', t => {
 });
 
 test('empty required option', t => {
-    const opt = option('string')
+    const opt = option.string
         .required();
 
     const res = handleOption(getOptData(opt), undefined);
@@ -164,7 +164,7 @@ test('empty required option', t => {
 });
 
 test('all empty & all optional', t => {
-    const opt = option('string');
+    const opt = option.string;
 
     const res = handleOption(getOptData(opt), undefined);
     t.false(isError(res.report.issue));
@@ -175,7 +175,7 @@ test('all empty & all optional', t => {
 });
 
 test('invalid array', t => {
-    const opt = option('string').array();
+    const opt = option.string.array();
 
     const res = handleOption(getOptData(opt), ['asd', true, false]);
 

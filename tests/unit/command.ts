@@ -151,7 +151,7 @@ test('command parsing', t => {
                 cmd: command({}).handle(() => {}).subCommands({
                     subA: command({
                         options: {
-                            i: option('int').description('opt-desc')
+                            i: option.int.description('opt-desc')
                         }
                     }).handle(() => handled = true)
                 })
@@ -218,7 +218,7 @@ test('command parsing', t => {
                 cmd: command({}).handle(() => {}).subCommands({
                     subA: command({
                         options: {
-                            i: option('int')
+                            i: option.int
                         }
                     }).handle(() => handled = true)
                 })
@@ -243,7 +243,7 @@ test('command parsing', t => {
                 cmd: command({}).handle(() => {}).subCommands({
                     subA: command({
                         options: {
-                            i: option('int')
+                            i: option.int
                         }
                     }).handle(() => handled = true)
                 })

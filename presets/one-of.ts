@@ -59,7 +59,7 @@ function normalizeDecl(decl: OneOfDecl): OneOfDeclNorm {
 const oneOf = <T extends OneOfDecl>(decl: T): Option<'string', false, false, ResolveOneOfDeclType<T>> => {
     const normDecl = normalizeDecl(decl);
     const keys = Object.keys(normDecl);
-    return option('string')
+    return option.string
         .completer(partial => {
             return keys
                 .filter(key => key.indexOf(partial) === 0)

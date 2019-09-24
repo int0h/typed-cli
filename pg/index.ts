@@ -9,9 +9,9 @@ const data = cli({
             .alias('o')
             .required()
             .description('opeartion to be applied'),
-        round: option('boolean').alias('r').description('rounds the result'),
+        round: option.boolean.alias('r').description('rounds the result'),
     },
-    _: option('number').array()
+    _: option.number.array()
 });
 
 const OperatorMap = {

@@ -81,6 +81,15 @@ export function changeOptData<O extends Option<any, any, any, any>>(opt: O, data
     return opt;
 }
 
+
+/**
+ * Defines a new option
+ * @param type option data type
+ */
+export function opt<T extends Types>(type: T): Option<T, false, false, ResolveType<T>> {
+    return new Option<T, false, false, ResolveType<T>>(type);
+}
+
 /**
  * Option - is a helper class used to configure options.
  * It's used for chained calls such as

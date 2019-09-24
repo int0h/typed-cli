@@ -1,8 +1,9 @@
-import url from 'url';
+import url, { UrlWithStringQuery } from 'url';
 
-import { option } from '../';
+import { Option } from '../src/option';
+import { opt } from '../src/option';
 
-const urlOption = option('string')
+const urlOption: () => Option<'string', boolean, boolean, UrlWithStringQuery> = () => opt('string')
     .label('url')
     .process('post', str => {
         return url.parse(str);

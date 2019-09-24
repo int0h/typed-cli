@@ -49,7 +49,7 @@ test('createCliHelper', t => {
                 name: 'test-cmd',
                 description: 'description',
                 options: {
-                    foo: option('int')
+                    foo: option.int
                 }
             });
         } catch(e) {}
@@ -67,7 +67,7 @@ test('createCliHelper', t => {
             name: 'test-cmd',
             description: 'description',
             options: {
-                foo: option('int')
+                foo: option.int
             }
         });
 
@@ -91,7 +91,7 @@ test('createCliHelper', t => {
                 name: 'test-cmd',
                 description: 'description',
                 options: {
-                    foo: option('int')
+                    foo: option.int
                 }
             });
         } catch(e) {}
@@ -139,7 +139,7 @@ test('createCliHelper:noHelpGeneration', t => {
             name: 'test-cmd',
             description: 'description',
             options: {
-                foo: option('int')
+                foo: option.int
             }
         });
     } catch(e) {}
