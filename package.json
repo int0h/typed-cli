@@ -7,7 +7,7 @@
     "lint": "eslint . --ignore-path ./.gitignore --ext .ts",
     "test": "nyc node ./tests/unit/index.js | tap-spec",
     "test-report": "nyc -r lcov node ./tests/unit/index.js | tap-spec",
-    "docs": "typedoc --out ./docs ./index.ts"
+    "docs": "typedoc"
   },
   "keywords": [],
   "author": "",
