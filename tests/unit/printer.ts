@@ -3,7 +3,7 @@ import test from 'tape';
 import { Printer } from '../../src/printer';
 import { en_US } from '../../src/i18n';
 import { plain } from '../../src/decorator';
-import { option } from '../../src/option';
+import { option } from '../../';
 import { Parser } from '../../src/parser';
 
 const helpTextRef =

@@ -4,7 +4,7 @@ import {command, _aliases, _decl, _fn, _subCommandSet, createCommandHelper, defa
 import { Printer } from '../../src/printer';
 import { locales } from '../../src/i18n';
 import { decorators } from '../../src/decorator';
-import { option } from '../../src/option';
+import { option } from '../../';
 
 test('command helper result', t => {
     const handleChild = (): void => {};

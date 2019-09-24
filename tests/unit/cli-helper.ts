@@ -4,7 +4,7 @@ import { createCliHelper } from '../../src/cli-helper';
 import { en_US } from '../../src/i18n';
 import { plain } from '../../src/decorator';
 import { Printer } from '../../src/printer';
-import { option } from '../../src/option';
+import { option } from '../../';
 
 test('createCliHelper', t => {
     let exitCode = -1;

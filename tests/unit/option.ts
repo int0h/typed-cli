@@ -1,6 +1,7 @@
 import test from 'tape';
 
-import { option, getOptData } from '../../src/option';
+import { getOptData } from '../../src/option';
+import { option } from '../../';
 
 test('option basic', t => {
     t.deepEqual(getOptData(option('any')), {
