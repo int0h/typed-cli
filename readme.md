@@ -1,5 +1,7 @@
 # typed-cli
 
+[![Coverage Status](https://coveralls.io/repos/github/int0h/typed-cli/badge.svg?branch=master)](https://coveralls.io/github/int0h/typed-cli?branch=master)
+
 ![typed-cli logo](./logo128.png)
 
 A library to help you create **type-safe** CLI's fast and simple.
