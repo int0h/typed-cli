@@ -1,6 +1,6 @@
 {
   "name": "typed-cli",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,9 +9,16 @@
     "test-report": "nyc -r lcov node ./tests/unit/index.js | tap-spec",
     "docs": "typedoc"
   },
-  "keywords": [],
+  "keywords": [
+    "cli",
+    "terminal",
+    "argv",
+    "argument",
+    "args",
+    "command"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^2.4.2",
     "string-argv": "^0.3.1",
@@ -26,6 +33,7 @@
     "@types/tape": "^4.2.33",
     "@typescript-eslint/eslint-plugin": "^2.2.0",
     "@typescript-eslint/parser": "^2.2.0",
+    "coveralls": "^3.0.6",
     "eslint": "^6.3.0",
     "node-pty": "^0.9.0-beta19",
     "node-pty-prebuilt": "^0.7.6",
