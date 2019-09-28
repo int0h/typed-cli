@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "tabtab": "git+https://github.com/int0h/tabtab.git#ba938481a264fcc60a21a3288b32485f28e7fcca",
-    "typed-cli": "^0.1.1"
+    "typed-cli": "*"
   }
 }

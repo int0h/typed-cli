@@ -52,7 +52,7 @@ class Dialog {
         });
 
         this.proc.onData(str => {
-            // process.stdout.write(str);
+            process.stdout.write(str);
             this.isReady = this.isReady || /root@.+:\/.+#/.test(str.replace(/^.*\n/, ''));
             this.buf += str;
         });

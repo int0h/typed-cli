@@ -1,9 +1,0 @@
-#! /usr/bin/env node
-const path = require('path');
-const {execSync} = require('child_process');
-
-const appDir = path.resolve(__dirname + '/app');
-const cmd = `docker run -it typed-cli-basics /bin/bash`;
-process.stdout.write(cmd);
-// console.log(res);
-
