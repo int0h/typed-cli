@@ -5,6 +5,7 @@ import { en_US } from '../../src/i18n';
 import { plain } from '../../src/decorator';
 import { option } from '../../';
 import { Parser } from '../../src/parser';
+import { command } from '../../src/command';
 
 const helpTextRef =
 `Description
@@ -50,6 +51,40 @@ test('printer:genHelp', t => {
     });
 
     t.equal(helpText, helpTextRef);
+
+    t.end();
+});
+
+const cmdTextRef = [
+    `Description`,
+    `prog description`,
+    ``,
+    `Commands`,
+    `  test-cmd | - description`,
+    ` test-cmd2 |`,
+    ``,
+    `Type prog <command> --help for detailed documentation`
+].join('\n');
+
+test('printer:command genHelp', t => {
+    const printer = new Printer({locale: en_US, decorator: plain});
+    const helpText = printer.generateHelpForComands({
+        program: 'prog',
+        description: 'prog description'
+    }, {
+        cmd1: command({
+            name: 'test-cmd',
+            description: 'description',
+            options: {},
+            _: option.number
+        }),
+        cmd2: command({
+            name: 'test-cmd2',
+            options: {},
+        })
+    })
+
+    t.equal(helpText, cmdTextRef);
 
     t.end();
 });
