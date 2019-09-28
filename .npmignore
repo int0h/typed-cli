@@ -6,3 +6,7 @@ todo
 coverage
 .nyc_output
 pg
+.travis.yml
+logo128.png
+demo.gif
+typedoc.js
