@@ -1,8 +1,7 @@
 # typed-cli
 
-**badges**
+![typed-cli logo](./logo128.png)
 
-**logo**
 A library to help you create **type-safe** CLI's fast and simple.
 
 # Usage example
@@ -49,7 +48,11 @@ This code will behave like this:
 
 # Playground
 
-You can test it without installing _anything_ on your machine. Just go to the [Demo](https://int0h.github.io/typed-cli-pg/index.html)(⚠️ it's about 20Mb of traffic).
+You can test it without installing _anything_ on your machine. Just go to the
+
+**[Interactive Demo](https://int0h.github.io/typed-cli-pg/index.html)**
+
+(⚠️it's about 20Mb of traffic).
 It has _interactive_ terminal and code editor, you can change the samples and see how it reacts.
 
 # Key features
