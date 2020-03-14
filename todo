@@ -9,6 +9,7 @@
 + commands
 + bash complition
 + enumType
+- remove <any>? it should be a string
 - maximize test coverage
 - multiline help cells & max cell width
 ? markdown in descriptions?
