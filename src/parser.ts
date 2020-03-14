@@ -3,7 +3,7 @@ import yargsParser from 'yargs-parser';
 import { OptionSet, getOptData, updateOptData } from './option';
 import { CliDeclaration, ResolveCliDeclaration } from './type-logic';
 import { handleAllOptions, handleOption } from './pipeline';
-import { createKebabAlias, objMap } from './utils';
+import { createKebabAlias, objMap, uniq } from './utils';
 import { Report, mergeReports, isError } from './report';
 import { allIssues } from './errors';
 
@@ -33,7 +33,7 @@ export function prepareCliDeclaration(decl: CliDeclaration): {decl: Required<Cli
         let resOpt = updateOptData(opt, {name});
         if (alias) {
             resOpt = updateOptData(resOpt, {
-                aliases: [...getOptData(opt).aliases, alias]
+                aliases: uniq([...getOptData(opt).aliases, alias])
             });
         }
         resOpt.name = name;
