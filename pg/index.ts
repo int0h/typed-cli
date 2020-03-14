@@ -15,10 +15,10 @@ const data = cli({
 });
 
 const OperatorMap = {
-    '+': (prev: number, cur: number) => prev + cur,
-    '/': (prev: number, cur: number) => prev / cur,
-    '-': (prev: number, cur: number) => prev - cur,
-    '*': (prev: number, cur: number) => prev * cur,
+    '+': (prev: number, cur: number): number => prev + cur,
+    '/': (prev: number, cur: number): number => prev / cur,
+    '-': (prev: number, cur: number): number => prev - cur,
+    '*': (prev: number, cur: number): number => prev * cur,
 };
 
 // Type safe!

@@ -1,7 +1,5 @@
 import test from 'tape';
 
-import stripAnsi from 'strip-ansi';
-
 import {locales, declareLocale} from '../../src/i18n';
 import {decorators} from '../../src/decorator';
 
