@@ -1,6 +1,6 @@
 {
   "name": "typed-cli",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -34,16 +34,16 @@
     "@typescript-eslint/eslint-plugin": "^2.2.0",
     "@typescript-eslint/parser": "^2.2.0",
     "coveralls": "^3.0.6",
-    "eslint": "^6.3.0",
+    "eslint": "^6.8.0",
     "node-pty": "^0.9.0-beta19",
     "node-pty-prebuilt": "^0.7.6",
-    "nyc": "^14.1.1",
+    "nyc": "^15.0.0",
     "source-map-support": "^0.5.13",
     "strip-ansi": "^5.2.0",
     "tap-spec": "^5.0.0",
     "tape": "^4.11.0",
     "ts-node": "^8.3.0",
-    "typedoc": "^0.15.0",
+    "typedoc": "^0.16.0",
     "typescript": "^3.6.3"
   }
 }
