@@ -6,6 +6,10 @@
 
 A library to help you create **type-safe** CLI's fast and simple.
 
+# Project state
+
+This project is still alive and maintained. But it is not in active development.
+
 # Usage example
 
 ```typescript
