@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-import {cli, option, presets} from '../';
+import {cli, option, presets} from '../index';
 
 const data = cli({
     name: 'calc',

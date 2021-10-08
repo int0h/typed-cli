@@ -2,11 +2,12 @@
   "name": "typed-cli",
   "version": "0.2.6",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint . --ignore-path ./.gitignore --ext .ts",
-    "test": "nyc node ./tests/unit/index.js | tap-spec",
-    "test-report": "nyc -r lcov node ./tests/unit/index.js | tap-spec",
+    "test": "nyc node ./dist/tests/unit/index.js | tap-spec",
+    "test-report": "nyc -r lcov node ./dist/tests/unit/index.js | tap-spec",
     "docs": "typedoc"
   },
   "keywords": [

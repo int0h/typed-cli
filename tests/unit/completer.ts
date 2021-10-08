@@ -2,7 +2,7 @@ import test from 'tape';
 
 import {normalizeCompleterOptions, completeForCliDecl, completeForCommandSet} from '../../src/completer';
 import { CliDeclaration } from '../../src/type-logic';
-import { option } from '../../';
+import { option } from '../../index';
 import { prepareCliDeclaration } from '../../src/parser';
 import { oneOf } from '../../presets';
 import { CommandSet, command, prepareCommandSet } from '../../src/command';

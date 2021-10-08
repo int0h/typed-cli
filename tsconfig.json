@@ -5,9 +5,11 @@
         "strict": true,
         "esModuleInterop": true,
         "inlineSourceMap": true,
-        "declaration": true
+        "declaration": true,
+        "outDir": "dist"
     },
     "exclude": [
+        "dist",
         "./tests/e2e/**/app/**/*.ts"
     ]
 }

@@ -1,4 +1,4 @@
-import { option } from '../';
+import { option } from '../index';
 import { objMap } from '../src/utils';
 import { Option } from '../src/option';
 import { allIssues } from '../src/errors';
