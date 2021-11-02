@@ -10,3 +10,5 @@ pg
 logo128.png
 demo.gif
 typedoc.js
+*.ts
+!*.d.ts
