@@ -28,6 +28,8 @@ export type CliDeclaration = {
     name?: string;
     options?: OptionSet;
     description?: string;
+    useEnv?: boolean;
+    envPrefix?: string;
     _?: Option<Types, boolean, boolean, any>;
 }
 

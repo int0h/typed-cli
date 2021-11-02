@@ -26,6 +26,7 @@ test('command helper result', t => {
 
 test('command parsing', t => {
     let argv: string[] = [];
+    let env = {};
     let exitCode = 0;
     let out = '';
     let handled = false;
@@ -39,6 +40,7 @@ test('command parsing', t => {
 
     const commandHelper = createCommandHelper({
         argvProvider: () => argv,
+        envProvider: () => env,
         exiter: (hasErrors) => exitCode = (hasErrors ? 1 : 0),
         helpGeneration: true,
         printer: new Printer({locale: locales.en_US, decorator: decorators.plain}),
@@ -113,7 +115,7 @@ test('command parsing', t => {
             });
             t.fail();
         } catch(e) {
-            t.is(e.message, 'exiter has failed');
+            t.is((e as any).message, 'exiter has failed');
         }
         t.is(handled, false);
         t.is(exitCode, 0);
@@ -157,7 +159,7 @@ test('command parsing', t => {
                 })
             });
         } catch(e) {
-            t.is(e.message, 'exiter has failed');
+            t.is((e as any).message, 'exiter has failed');
         }
         t.is(handled, false);
         t.is(exitCode, 0);
@@ -224,7 +226,7 @@ test('command parsing', t => {
                 })
             });
         } catch(e) {
-            t.is(e.message, 'exiter has failed');
+            t.is((e as any).message, 'exiter has failed');
         }
         t.is(handled, false);
         t.is(exitCode, 1);
@@ -249,7 +251,7 @@ test('command parsing', t => {
                 })
             });
         } catch(e) {
-            t.is(e.message, 'exiter has failed');
+            t.is((e as any).message, 'exiter has failed');
         }
         t.is(handled, true);
         t.is(exitCode, 0);

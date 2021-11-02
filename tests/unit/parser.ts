@@ -15,7 +15,7 @@ test('every option type', t => {
         }
     });
 
-    const {data, report} = parser.parse('--int 12.23 --number qwe --string');
+    const {data, report} = parser.parse('--int 12.23 --number qwe --string', {});
 
     t.equal(data, null);
 
@@ -47,7 +47,7 @@ test('parsing valid data', t => {
         }
     });
 
-    const {data, report} = parser.parse('--int 12 --boolean --number 123 --string asd');
+    const {data, report} = parser.parse('--int 12 --boolean --number 123 --string asd', {});
 
     t.equal(report.children.length, 0);
     t.deepEqual(data!.options, {
@@ -65,7 +65,7 @@ test('parsing ivalid arguments', t => {
         _: option.int
     });
 
-    const {data, report} = parser.parse('asd');
+    const {data, report} = parser.parse('asd', {});
 
     t.equal(data, null);
 
@@ -86,7 +86,7 @@ test('empty required argument', t => {
         _: option.int.required()
     });
 
-    const {data, report} = parser.parse('');
+    const {data, report} = parser.parse('', {});
 
     t.equal(data, null);
 
@@ -129,7 +129,7 @@ test('passing array for non-array option', t => {
         _: option.int.required()
     });
 
-    const {data, report} = parser.parse('1 2 3');
+    const {data, report} = parser.parse('1 2 3', {});
 
     t.equal(data, null);
 
@@ -148,7 +148,7 @@ test('parsing valid array of arguments', t => {
         _: option.int.array()
     });
 
-    const {data, report} = parser.parse('1 2 3');
+    const {data, report} = parser.parse('1 2 3', {});
 
     t.deepEqual(data!._, [1, 2, 3]);
 
@@ -162,7 +162,7 @@ test('parsing one valid arguments', t => {
         _: option.int
     });
 
-    const {data, report} = parser.parse('1');
+    const {data, report} = parser.parse('1', {});
 
     t.deepEqual(data!._, 1);
 
@@ -176,9 +176,61 @@ test('parsing one argument when multiple supported', t => {
         _: option.int.array()
     });
 
-    const {data, report} = parser.parse('1');
+    const {data, report} = parser.parse('1', {});
 
     t.deepEqual(data!._ as number[], [1]);
+
+    t.false(isError(report.issue));
+
+    t.end();
+});
+
+test('parsing from ENV', t => {
+    const parser = new Parser({
+        useEnv: true,
+        options: {
+            foo: option.int.array()
+        }
+    });
+
+    const {data, report} = parser.parse('', {FOO: '1'});
+
+    t.deepEqual(data?.options.foo as number[], [1]);
+
+    t.false(isError(report.issue));
+
+    t.end();
+});
+
+test('parsing from ENV: mutli-word', t => {
+    const parser = new Parser({
+        useEnv: true,
+        options: {
+            envOpt: option.int.array()
+        }
+    });
+
+    const {data, report} = parser.parse('', {ENV_OPT: '1'});
+
+    t.deepEqual(data?.options.envOpt as number[], [1]);
+
+    t.false(isError(report.issue));
+
+    t.end();
+});
+
+test('parsing from ENV: name as prefix by default', t => {
+    const parser = new Parser({
+        useEnv: true,
+        name: 'program',
+        options: {
+            envOpt: option.int.array()
+        }
+    });
+
+    const {data, report} = parser.parse('', {PROGRAM_ENV_OPT: '1'});
+
+    t.deepEqual(data?.options.envOpt as number[], [1]);
 
     t.false(isError(report.issue));
 

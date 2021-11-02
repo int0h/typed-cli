@@ -1,4 +1,4 @@
-import { createCliHelper, ArgvProvider, Exiter, Writer } from './cli-helper';
+import { createCliHelper, ArgvProvider, Exiter, Writer, EnvProvider } from './cli-helper';
 import { Printer } from './printer';
 import { en_US } from './i18n';
 import { fancy } from './decorator';
@@ -8,6 +8,8 @@ import { CliDeclaration, ResolveCliDeclaration } from './type-logic';
 export const defaultPrinter = new Printer({locale: en_US, decorator: fancy});
 
 export const defaultArgvProvider: ArgvProvider = () => process.argv.slice(2);
+
+export const defaultEnvProvider: EnvProvider = () => process.env;
 
 export const defaultExiter: Exiter = hasErrors => process.exit(hasErrors ? 1 : 0);
 
@@ -22,6 +24,7 @@ export const defaultWriter: Writer = (text, logType) => {
 const cliHelper = createCliHelper({
     printer: defaultPrinter,
     argvProvider: defaultArgvProvider,
+    envProvider: defaultEnvProvider,
     exiter: defaultExiter,
     writer: defaultWriter,
     helpGeneration: true,
@@ -30,6 +33,7 @@ const cliHelper = createCliHelper({
 
 export const setupCommands = createCommandHelper({
     printer: defaultPrinter,
+    envProvider: defaultEnvProvider,
     argvProvider: defaultArgvProvider,
     exiter: defaultExiter,
     writer: defaultWriter,

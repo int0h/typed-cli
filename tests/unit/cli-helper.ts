@@ -18,11 +18,13 @@ test('createCliHelper', t => {
         log.error = '';
         log.log = '';
     }
+    let env = {};
 
     const printer = new Printer({locale: en_US, decorator: plain});
 
     const cli = createCliHelper({
         argvProvider: () => argv.split(' '),
+        envProvider: () => env,
         exiter: hasErrors => exitCode = (hasErrors ? 1 : 0),
         helpGeneration: true,
         writer: (text, logType) => {log[logType] += '\n' + text},
@@ -117,11 +119,13 @@ test('createCliHelper:noHelpGeneration', t => {
         log.error = '';
         log.log = '';
     }
+    let env = {};
 
     const printer = new Printer({locale: en_US, decorator: plain});
 
     const cli = createCliHelper({
         argvProvider: () => argv.split(' '),
+        envProvider: () => env,
         exiter: hasErrors => exitCode = (hasErrors ? 1 : 0),
         writer: (text, logType) => {log[logType] += '\n' + text},
         printer
