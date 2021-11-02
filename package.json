@@ -3,6 +3,7 @@
   "version": "0.2.6",
   "description": "",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "lint": "eslint . --ignore-path ./.gitignore --ext .ts",
     "test": "nyc node ./tests/unit/index.js",
