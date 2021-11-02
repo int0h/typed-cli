@@ -115,8 +115,8 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
         postPreprocessors: [],
     };
 
-    private _isRequired!: R;
-    private _isArray!: A;
+    _isRequired!: R;
+    _isArray!: A;
 
     constructor(type: T) {
         this[optionDataKey].type = type;
