@@ -136,16 +136,14 @@ test('passing array for non-array option', t => {
     validateReport(report, {
         issue: [allIssues.IvalidInputError, {}],
         children: [
-            {issue: [allIssues.IvalidArguemntError, {value: [1, 2, 3]}], children: [
-                {issue: [allIssues.TypeMismatchError, {}], children: []}
-            ]}
+            {issue: [allIssues.TooManyArgumentsError, {}], children: []}
         ]
     });
 
     t.end();
 });
 
-test('parsing valid arguments', t => {
+test('parsing valid array of arguments', t => {
     const parser = new Parser({
         _: option.int.array()
     });
@@ -153,6 +151,34 @@ test('parsing valid arguments', t => {
     const {data, report} = parser.parse('1 2 3');
 
     t.deepEqual(data!._, [1, 2, 3]);
+
+    t.false(isError(report.issue));
+
+    t.end();
+});
+
+test('parsing one valid arguments', t => {
+    const parser = new Parser({
+        _: option.int
+    });
+
+    const {data, report} = parser.parse('1');
+
+    t.deepEqual(data!._, 1);
+
+    t.false(isError(report.issue));
+
+    t.end();
+});
+
+test('parsing one argument when multiple supported', t => {
+    const parser = new Parser({
+        _: option.int.array()
+    });
+
+    const {data, report} = parser.parse('1');
+
+    t.deepEqual(data!._ as number[], [1]);
 
     t.false(isError(report.issue));
 

@@ -20,7 +20,7 @@ function runValidator(validator: Validator<any>, value: any): undefined | Error 
     try {
         validator(value);
     } catch(e) {
-        return e;
+        return e as any;
     }
 }
 

@@ -15,6 +15,7 @@ test('declareLocale', t => {
             TypeMismatchError: (): string => 'TypeMismatchError',
             IvalidSomeArguemntsError: (): string => 'IvalidSomeArguemntsError',
             IvalidArguemntError: (): string => 'IvalidArguemntError',
+            TooManyArgumentsError: (): string => 'TooManyArgumentsError',
             InvalidCommand: (): string => 'InvalidCommand',
             NoCommand: (): string => 'NoCommand',
         },

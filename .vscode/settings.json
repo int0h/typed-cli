@@ -4,9 +4,7 @@
         "**/.svn": true,
         "**/.hg": true,
         "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/*.js.map": true,
-        "**/*.d.ts": true
+        "**/.DS_Store": true
     },
     "eslint.validate": [
         "javascript",

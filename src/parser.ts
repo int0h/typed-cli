@@ -70,22 +70,27 @@ export class Parser<D extends CliDeclaration> {
         return handleAllOptions(this.optCfg, extractOptionsFromYargs(parsed), this.usedKeys);
     }
 
-    private normalizeArgs(args: any[]): undefined | unknown | unknown[] {
-        switch (args.length) {
-            case 0:
-                return undefined;
-            case 1:
-                return args[0];
-            default:
-                return args;
-        }
-    }
-
     private parseArguments(parsed: any): {data: any; report: Report} {
         if (this.decl._) {
-            const parsedArgs = getOptData(this.decl._).isArray
-                ? parsed._
-                : this.normalizeArgs(parsed._);
+            let parsedArgs = parsed._;
+
+            if (!getOptData(this.decl._).isArray) {
+                // if multiiple args passed to single argument program
+                if (parsedArgs.length > 1) {
+                    return {
+                        data: undefined,
+                        report: {
+                            issue: new allIssues.IvalidSomeArguemntsError(),
+                            children: [{
+                                issue: new allIssues.TooManyArgumentsError(),
+                                children: []
+                            }]
+                        }
+                    }
+                }
+                parsedArgs = parsedArgs[0];
+            }
+
             const {value, report} = handleOption(getOptData(this.decl._), parsedArgs);
             if (isError(report.issue)) {
                 return {
