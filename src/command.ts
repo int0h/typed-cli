@@ -246,7 +246,7 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
             if (!program) {
                 throw new Error('program name must be provided for completions');
             }
-            handleCompleterOptions(argv[0], cfg.completer, program, () => {
+            const handled = handleCompleterOptions(argv[0], cfg.completer, program, () => {
                 tabtabCommandDeclComplete(cs);
                 exiter(false);
                 throw new Error('exiter has failed');
@@ -254,6 +254,9 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
                 exiter(hasErrors);
                 throw new Error('exiter has failed');
             });
+            if (handled) {
+                return;
+            }
         }
         const onReport = (report: Report): void => {
             const printedReport = printer.stringifyReport(report);
