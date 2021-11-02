@@ -1,6 +1,5 @@
 import test from 'tape';
-
-import stripAnsi from 'strip-ansi';
+import {stripAnsi} from './strip-ansi';
 
 import {decorators} from '../../src/decorator';
 

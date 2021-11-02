@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --ignore-path ./.gitignore --ext .ts",
-    "test": "nyc node ./tests/unit/index.js | tap-spec",
-    "test-report": "nyc -r lcov node ./tests/unit/index.js | tap-spec",
+    "test": "nyc node ./tests/unit/index.js",
+    "test-report": "nyc -r lcov node ./tests/unit/index.js",
     "docs": "typedoc"
   },
   "keywords": [
@@ -20,30 +20,27 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^2.4.2",
+    "@types/node": "^16.11.6",
+    "@types/string-argv": "^0.1.0",
+    "@types/yargs-parser": "^20.2.1",
+    "chalk": "^4.1.2",
     "string-argv": "^0.3.1",
     "tabtab": "git+https://github.com/int0h/tabtab.git#ba938481a264fcc60a21a3288b32485f28e7fcca",
-    "yargs-parser": "^14.0.0",
-    "@types/node": "^12.7.4",
-    "@types/string-argv": "^0.1.0",
-    "@types/yargs-parser": "^13.1.0"
+    "yargs-parser": "^20.2.9"
   },
   "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^0.1.3",
-    "@types/tape": "^4.2.33",
-    "@typescript-eslint/eslint-plugin": "^2.2.0",
-    "@typescript-eslint/parser": "^2.2.0",
-    "coveralls": "^3.0.6",
-    "eslint": "^6.8.0",
-    "node-pty": "^0.9.0-beta19",
-    "node-pty-prebuilt": "^0.7.6",
-    "nyc": "^15.0.0",
-    "source-map-support": "^0.5.13",
-    "strip-ansi": "^5.2.0",
-    "tap-spec": "^5.0.0",
-    "tape": "^4.11.0",
-    "ts-node": "^8.3.0",
-    "typedoc": "^0.16.0",
-    "typescript": "^3.6.3"
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/tape": "^4.13.2",
+    "@typescript-eslint/eslint-plugin": "^5.3.0",
+    "@typescript-eslint/parser": "^5.3.0",
+    "coveralls": "^3.1.1",
+    "eslint": "^8.1.0",
+    "node-pty": "^0.10.1",
+    "nyc": "^15.1.0",
+    "source-map-support": "^0.5.20",
+    "tape": "^5.3.1",
+    "ts-node": "^10.4.0",
+    "typedoc": "^0.22.7",
+    "typescript": "^4.4.4"
   }
 }

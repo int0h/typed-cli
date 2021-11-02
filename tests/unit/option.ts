@@ -37,6 +37,7 @@ test('option basic', t => {
         .validate(valFn);
 
     const data = getOptData(opt);
+    //@ts-ignore
     delete data.postPreprocessors;
     t.deepEqual(data, {
         name: '',
