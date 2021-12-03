@@ -1,6 +1,6 @@
 {
   "name": "typed-cli",
-  "version": "1.1.0-rc",
+  "version": "1.2.0",
   "description": "",
   "main": "index.js",
   "types": "index.d.ts",
