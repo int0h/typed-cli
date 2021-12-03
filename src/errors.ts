@@ -55,6 +55,10 @@ class IvalidArguemntError extends BaseError {
     }
 }
 
+class TooManyArgumentsError extends BaseError {
+    className = 'TooManyArgumentsError' as const;
+}
+
 class InvalidCommand extends BaseError {
     className = 'InvalidCommand' as const;
     commandName: any;
@@ -91,6 +95,7 @@ export const allIssues = {
     IvalidOptionError,
     IvalidSomeArguemntsError,
     IvalidArguemntError,
+    TooManyArgumentsError,
     SomeIvalidOptionsError,
     IvalidInputError,
     TypeMismatchError,

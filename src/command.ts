@@ -1,7 +1,7 @@
 import { CliDeclaration, ResolveCliDeclaration } from "./type-logic";
 import { createKebabAlias, findKeyCollision } from "./utils";
 import { Parser, prepareCliDeclaration } from "./parser";
-import { Writer, Exiter, ArgvProvider } from "./cli-helper";
+import { Writer, Exiter, ArgvProvider, EnvProvider } from "./cli-helper";
 import { Printer } from "./printer";
 import { isError } from "util";
 import { Report, errorToReport } from "./report";
@@ -109,7 +109,8 @@ function getCommandSetAliases(cs: CommandSet): string[] {
 }
 
 /** @hidden */
-export function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''): C {
+export function prepareCommandSet<C extends CommandSet>(cs: C, cfg: CommandHelperParams = {}): C {
+    const namePrefix = cfg.program ?? '';
     const res: C = {} as C;
     for (const key of Object.keys(cs).sort()) {
         const cmd = cs[key][_clone]();
@@ -125,7 +126,9 @@ export function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''):
             ...prepareCliDeclaration(cmd[_decl]).decl,
             name: namePrefix + ' ' + key
         };
-        cmd[_subCommandSet] = prepareCommandSet(cmd[_subCommandSet], namePrefix + ' ' + key);
+        cmd[_subCommandSet] = prepareCommandSet(cmd[_subCommandSet], {...cfg, program: namePrefix + ' ' + key});
+        cmd[_decl].useEnv ??= cfg.useEnv;
+        cmd[_decl].envPrefix ??= cfg.envPrefix;
         res[key as keyof C] = cmd as any;
     }
     const defCmd = cs[defaultCommand];
@@ -151,6 +154,7 @@ export function prepareCommandSet<C extends CommandSet>(cs: C, namePrefix = ''):
 export type ParseCommandSetParams = {
     cs: CommandSet;
     argv: string[];
+    env: Record<string, string | undefined>;
     onReport: (report: Report) => void;
     onHelp?: (cmd: CommandBuilder<CliDeclaration>) => void;
 }
@@ -177,11 +181,12 @@ export function findMatchedCommand(argv: string[], cs: CommandSet): CommandBuild
     return childMatch || matched;
 }
 
-function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], params: ParseCommandSetParams): void {
+function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], env: Record<string, string | undefined>, params: ParseCommandSetParams): void {
     const {onReport, onHelp} = params;
     const handledByChild = parseCommandSet({
         cs: cmd[_subCommandSet],
         argv: args,
+        env,
         onReport,
         onHelp
     });
@@ -193,7 +198,7 @@ function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], param
         return;
     }
     const parser = new Parser(cmd[_decl]);
-    const {report, data} = parser.parse(args);
+    const {report, data} = parser.parse(args, env);
     if (report.issue !== null || report.children.length > 0) {
         onReport(report);
     }
@@ -203,11 +208,11 @@ function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], param
 
 /** @hidden */
 export function parseCommandSet(params: ParseCommandSetParams): boolean {
-    const {cs, argv} = params;
+    const {cs, argv, env} = params;
     const [commandName, ...args] = argv;
     for (const cmd of Object.values(cs)) {
         if (cmd[_match](commandName)) {
-            parseCommand(cmd, args, params);
+            parseCommand(cmd, args, env, params);
             return true;
         }
     }
@@ -218,6 +223,7 @@ export type CreateCommandHelperParams = {
     writer: Writer;
     exiter: Exiter;
     argvProvider: ArgvProvider;
+    envProvider: EnvProvider;
     printer: Printer;
     helpGeneration?: boolean;
 }
@@ -229,6 +235,10 @@ export type CommandHelperParams = {
     description?: string;
     /** `true` or completer config if tab complitions wanted */
     completer?: CompleterOptions | boolean;
+    /** parse options from environmental variables */
+    useEnv?: boolean;
+    /** environmental variable prefix */
+    envPrefix?: string;
 }
 
 /**
@@ -238,15 +248,16 @@ export type CommandHelperParams = {
  */
 export const createCommandHelper = (params: CreateCommandHelperParams) =>
     (cfg: CommandHelperParams, cs: CommandSet): void => {
-        cs = prepareCommandSet(cs, cfg.program);
-        const {writer, exiter, argvProvider, printer, helpGeneration} = params;
+        cs = prepareCommandSet(cs, cfg);
+        const {writer, exiter, argvProvider, envProvider, printer, helpGeneration} = params;
         const argv = argvProvider();
+        const env = envProvider();
         if (cfg.completer) {
             const program = cfg.program;
             if (!program) {
                 throw new Error('program name must be provided for completions');
             }
-            handleCompleterOptions(argv[0], cfg.completer, program, () => {
+            const handled = handleCompleterOptions(argv[0], cfg.completer, program, () => {
                 tabtabCommandDeclComplete(cs);
                 exiter(false);
                 throw new Error('exiter has failed');
@@ -254,6 +265,9 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
                 exiter(hasErrors);
                 throw new Error('exiter has failed');
             });
+            if (handled) {
+                return;
+            }
         }
         const onReport = (report: Report): void => {
             const printedReport = printer.stringifyReport(report);
@@ -266,7 +280,7 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
         const onHelp = (cmd: CommandBuilder<CliDeclaration>): void => {
             writer(printer.generateHelp(cmd[_decl]), 'log');
         }
-        const handled = parseCommandSet({cs, argv, onReport, onHelp});
+        const handled = parseCommandSet({cs, argv, env, onReport, onHelp});
         if (handled) {
             return;
         }
@@ -281,7 +295,7 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
         const hasCommand = firstCommand && /^[^-]/.test(firstCommand);
         if (!hasCommand) {
             if (defCmd) {
-                parseCommand(defCmd, argv, {cs, argv, onReport, onHelp});
+                parseCommand(defCmd, argv, env, {cs, argv, env, onReport, onHelp});
                 return;
             } else {
                 onReport(errorToReport(new allIssues.NoCommand()));

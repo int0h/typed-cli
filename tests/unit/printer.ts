@@ -209,7 +209,7 @@ test('printer:stringifyReport:basic types', t => {
         '--foo', '0',
         '--bar', '1',
         '--invalid'
-    ]);
+    ], {});
 
     t.equal(data, null);
 
@@ -231,7 +231,7 @@ test('printer:stringifyReport:valid report', t => {
 
     const {report} = parser.parse([
         '--booleanOpt'
-    ]);
+    ], {});
 
     t.equals(printer.stringifyReport(report), '');
 

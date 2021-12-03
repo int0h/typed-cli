@@ -1,8 +1,7 @@
-// import {spawn, ChildProcessWithoutNullStreams, exec, execSync} from 'child_process';
 import {spawn, IPty} from 'node-pty';
 import test from 'tape';
 import chalk from 'chalk';
-import stripAnsi from 'strip-ansi';
+import {stripAnsi} from '../../unit/strip-ansi';
 
 const sleep = (time: number): Promise<void> => new Promise((resolve): any => setTimeout(resolve, time));
 const waitFor = (isReadyFn: () => boolean, interval = 25): Promise<void> => {

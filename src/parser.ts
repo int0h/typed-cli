@@ -54,38 +54,56 @@ function extractOptionsFromYargs(data: any): any {
     return copyData;
 }
 
+function optNameToEnvName(optName: string) {
+    return optName
+        .replace(/[A-Z]/g, l => '_' + l)
+        .toUpperCase();
+}
+
 export class Parser<D extends CliDeclaration> {
     private optCfg: Record<string, any>;
     private decl: D;
     private usedKeys: Set<string>;
+    private envPrefix: string;
+    private useEnv: boolean;
 
     constructor(decl: D) {
         const {decl: declPrepared, usedKeys} = prepareCliDeclaration(decl);
         this.usedKeys = usedKeys;
         this.decl = declPrepared as D;
         this.optCfg = objMap(declPrepared.options, item => getOptData(item));
+        this.envPrefix = decl.envPrefix ?? '';
+        this.useEnv = decl.useEnv ?? false;
+        if (decl.useEnv && decl.envPrefix === undefined && decl.name) {
+            this.envPrefix = optNameToEnvName(decl.name) + '_';
+        }
     }
 
     private parseOptions(parsed: any): {data: any; report: Report} {
         return handleAllOptions(this.optCfg, extractOptionsFromYargs(parsed), this.usedKeys);
     }
 
-    private normalizeArgs(args: any[]): undefined | unknown | unknown[] {
-        switch (args.length) {
-            case 0:
-                return undefined;
-            case 1:
-                return args[0];
-            default:
-                return args;
-        }
-    }
-
     private parseArguments(parsed: any): {data: any; report: Report} {
         if (this.decl._) {
-            const parsedArgs = getOptData(this.decl._).isArray
-                ? parsed._
-                : this.normalizeArgs(parsed._);
+            let parsedArgs = parsed._;
+
+            if (!getOptData(this.decl._).isArray) {
+                // if multiiple args passed to single argument program
+                if (parsedArgs.length > 1) {
+                    return {
+                        data: undefined,
+                        report: {
+                            issue: new allIssues.IvalidSomeArguemntsError(),
+                            children: [{
+                                issue: new allIssues.TooManyArgumentsError(),
+                                children: []
+                            }]
+                        }
+                    }
+                }
+                parsedArgs = parsedArgs[0];
+            }
+
             const {value, report} = handleOption(getOptData(this.decl._), parsedArgs);
             if (isError(report.issue)) {
                 return {
@@ -101,14 +119,38 @@ export class Parser<D extends CliDeclaration> {
         return {data: undefined, report: {issue: null, children: []}};
     }
 
-    parse(argv: string[] | string): {report: Report; data: ResolveCliDeclaration<D> | null} {
+    private parseEnv(env: Record<string, string | undefined>) {
+        if (!this.useEnv) {
+            return {};
+        }
+        const res: Record<string, any> = {};
+        Object.keys(this.optCfg).forEach(key => {
+            const envKey = this.envPrefix + optNameToEnvName(key);
+            if (env[envKey]) {
+                switch (this.optCfg[key].type) {
+                    case 'number':
+                    case 'int':
+                        res[key] = Number(env[envKey]!);
+                        break;
+                    case 'boolean':
+                        res[key] = Boolean(env[envKey]!);
+                        break;
+                    default:
+                        res[key] = env[envKey]!;
+                }
+            }
+        });
+        return res;
+    }
+
+    parse(argv: string[] | string, env: Record<string, string | undefined>): {report: Report; data: ResolveCliDeclaration<D> | null} {
         const parsed = yargsParser(argv, {
             alias: this.decl.options && objMap(this.decl.options, item => getOptData(item).aliases),
             boolean: Object.values(this.decl.options as OptionSet)
                 .filter(opt => getOptData(opt).type === 'boolean')
                 .map(opt => opt.name)
         });
-        const {report: optionsReport, data: optionsData} = this.parseOptions(parsed);
+        const {report: optionsReport, data: optionsData} = this.parseOptions({...this.parseEnv(env), ...parsed});
         const {report: argumentsReport, data: argumentsData} = this.parseArguments(parsed);
         const report = mergeReports(new allIssues.IvalidInputError, optionsReport, argumentsReport);
         if (isError(report.issue)) {
