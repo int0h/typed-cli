@@ -88,12 +88,12 @@ export class Parser<D extends CliDeclaration> {
             let parsedArgs = parsed._;
 
             if (!getOptData(this.decl._).isArray) {
-                // if multiiple args passed to single argument program
+                // if multiple args passed to single argument program
                 if (parsedArgs.length > 1) {
                     return {
                         data: undefined,
                         report: {
-                            issue: new allIssues.IvalidSomeArguemntsError(),
+                            issue: new allIssues.InvalidSomeArgumentsError(),
                             children: [{
                                 issue: new allIssues.TooManyArgumentsError(),
                                 children: []
@@ -109,7 +109,7 @@ export class Parser<D extends CliDeclaration> {
                 return {
                     data: value,
                     report: {
-                        issue: new allIssues.IvalidSomeArguemntsError(),
+                        issue: new allIssues.InvalidSomeArgumentsError(),
                         children: [report]
                     }
                 }
@@ -152,7 +152,7 @@ export class Parser<D extends CliDeclaration> {
         });
         const {report: optionsReport, data: optionsData} = this.parseOptions({...this.parseEnv(env), ...parsed});
         const {report: argumentsReport, data: argumentsData} = this.parseArguments(parsed);
-        const report = mergeReports(new allIssues.IvalidInputError, optionsReport, argumentsReport);
+        const report = mergeReports(new allIssues.InvalidInputError, optionsReport, argumentsReport);
         if (isError(report.issue)) {
             return {report, data: null};
         }

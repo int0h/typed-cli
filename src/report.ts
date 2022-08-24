@@ -44,7 +44,7 @@ export function mergeReports(conclusion: Issue, ...reports: Report[]): Report {
 
 export function errorToReport(err: Error): Report {
     return {
-        issue: new allIssues.IvalidInputError(),
+        issue: new allIssues.InvalidInputError(),
         children: [{
             issue: err,
             children: []

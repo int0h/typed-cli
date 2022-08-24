@@ -27,8 +27,8 @@ class TypeMismatchError extends BaseError {
     }
 }
 
-class IvalidOptionError extends BaseError {
-    className = 'IvalidOptionError' as const;
+class InvalidOptionError extends BaseError {
+    className = 'InvalidOptionError' as const;
     optionName: string;
     value: any;
     constructor(optionName: string, value: any) {
@@ -38,16 +38,16 @@ class IvalidOptionError extends BaseError {
     }
 }
 
-class SomeIvalidOptionsError extends BaseError {
-    className = 'SomeIvalidOptionsError' as const;
+class SomeInvalidOptionsError extends BaseError {
+    className = 'SomeInvalidOptionsError' as const;
 }
 
-class IvalidSomeArguemntsError extends BaseError {
-    className = 'IvalidSomeArguemntsError' as const;
+class InvalidSomeArgumentsError extends BaseError {
+    className = 'InvalidSomeArgumentsError' as const;
 }
 
-class IvalidArguemntError extends BaseError {
-    className = 'IvalidArguemntError' as const;
+class InvalidArgumentError extends BaseError {
+    className = 'InvalidArgumentError' as const;
     value: any;
     constructor(value: any) {
         super();
@@ -72,8 +72,8 @@ class NoCommand extends BaseError {
     className = 'NoCommand' as const;
 }
 
-class IvalidInputError extends BaseError {
-    className = 'IvalidInputError' as const;
+class InvalidInputError extends BaseError {
+    className = 'InvalidInputError' as const;
 }
 
 class UnknownOptionWarning extends BaseWarning {
@@ -92,12 +92,12 @@ export type IssueType = {
 export const allIssues = {
     UnknownOptionWarning,
     EmptyRequiredOptionError,
-    IvalidOptionError,
-    IvalidSomeArguemntsError,
-    IvalidArguemntError,
+    InvalidOptionError,
+    InvalidSomeArgumentsError,
+    InvalidArgumentError,
     TooManyArgumentsError,
-    SomeIvalidOptionsError,
-    IvalidInputError,
+    SomeInvalidOptionsError,
+    InvalidInputError,
     TypeMismatchError,
     InvalidCommand,
     NoCommand

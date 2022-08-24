@@ -145,7 +145,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
     /**
      * Allows to create custom type name.
      * Useful for presets, allows to get output like:
-     * `expected <MyType> but recieved <string>`
+     * `expected <MyType> but received <string>`
      * @param name - new label for the type
      */
     label(name: string): Option<T, R, A, RT> {
@@ -168,9 +168,9 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
     }
 
     /**
-     * Sets the compliter for the option.
+     * Sets the completer for the option.
      * A completer is a function to be called when
-     * shell completion is computated for an option.
+     * shell completion is computed for an option.
      * See 'oneOf' preset source code for usage.
      * @param completer - completer function
      */

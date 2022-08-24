@@ -8,7 +8,7 @@ const data = cli({
         operation: presets.oneOf(['+', '-', '*', '/'] as const)
             .alias('o')
             .required()
-            .description('opeartion to be applied'),
+            .description('operation to be applied'),
         round: option.boolean.alias('r').description('rounds the result'),
     },
     _: option.number.array()

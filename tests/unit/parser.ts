@@ -20,15 +20,15 @@ test('every option type', t => {
     t.equal(data, null);
 
     validateReport(report, {
-        issue: [allIssues.IvalidInputError, {}],
+        issue: [allIssues.InvalidInputError, {}],
         children: [
-            {issue: [allIssues.IvalidOptionError, {optionName: 'int', value: 12.23}], children: [
+            {issue: [allIssues.InvalidOptionError, {optionName: 'int', value: 12.23}], children: [
                 {issue: [allIssues.TypeMismatchError, {}], children: []}
             ]},
-            {issue: [allIssues.IvalidOptionError, {optionName: 'number', value: 'qwe'}], children: [
+            {issue: [allIssues.InvalidOptionError, {optionName: 'number', value: 'qwe'}], children: [
                 {issue: [allIssues.TypeMismatchError, {}], children: []}
             ]},
-            {issue: [allIssues.IvalidOptionError, {optionName: 'string', value: true}], children: [
+            {issue: [allIssues.InvalidOptionError, {optionName: 'string', value: true}], children: [
                 {issue: [allIssues.TypeMismatchError, {}], children: []}
             ]},
         ]
@@ -60,7 +60,7 @@ test('parsing valid data', t => {
     t.end();
 });
 
-test('parsing ivalid arguments', t => {
+test('parsing Invalid arguments', t => {
     const parser = new Parser({
         _: option.int
     });
@@ -70,9 +70,9 @@ test('parsing ivalid arguments', t => {
     t.equal(data, null);
 
     validateReport(report, {
-        issue: [allIssues.IvalidInputError, {}],
+        issue: [allIssues.InvalidInputError, {}],
         children: [
-            {issue: [allIssues.IvalidArguemntError, {value: 'asd'}], children: [
+            {issue: [allIssues.InvalidArgumentError, {value: 'asd'}], children: [
                 {issue: [allIssues.TypeMismatchError, {}], children: []}
             ]}
         ]
@@ -91,9 +91,9 @@ test('empty required argument', t => {
     t.equal(data, null);
 
     validateReport(report, {
-        issue: [allIssues.IvalidInputError, {}],
+        issue: [allIssues.InvalidInputError, {}],
         children: [
-            {issue: [allIssues.IvalidArguemntError, {value: undefined}], children: [
+            {issue: [allIssues.InvalidArgumentError, {value: undefined}], children: [
                 {issue: [allIssues.EmptyRequiredOptionError, {}], children: []}
             ]}
         ]
@@ -134,7 +134,7 @@ test('passing array for non-array option', t => {
     t.equal(data, null);
 
     validateReport(report, {
-        issue: [allIssues.IvalidInputError, {}],
+        issue: [allIssues.InvalidInputError, {}],
         children: [
             {issue: [allIssues.TooManyArgumentsError, {}], children: []}
         ]

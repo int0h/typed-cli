@@ -37,8 +37,8 @@ function validateOption(optCfg: ValidationCfg, value: any): Report {
         if (optCfg.isRequired) {
             return {
                 issue: optCfg.isArg
-                    ? new allIssues.IvalidArguemntError(value)
-                    : new allIssues.IvalidOptionError(optCfg.name, value),
+                    ? new allIssues.InvalidArgumentError(value)
+                    : new allIssues.InvalidOptionError(optCfg.name, value),
                 children: [{
                     issue: new allIssues.EmptyRequiredOptionError(optCfg.name),
                     children: []
@@ -59,8 +59,8 @@ function validateOption(optCfg: ValidationCfg, value: any): Report {
     });
     return combineIssues(
         optCfg.isArg
-            ? new allIssues.IvalidArguemntError(value)
-            : new allIssues.IvalidOptionError(optCfg.name, value)
+            ? new allIssues.InvalidArgumentError(value)
+            : new allIssues.InvalidOptionError(optCfg.name, value)
     , issues);
 }
 
@@ -88,7 +88,7 @@ function handleArrayOption(optCfg: OptCfg, value: any): {value: any[] | null; re
         resValue.push(res.value);
         issues = [...issues, ...res.report.children.map(c => c.issue)];
     });
-    const report = combineIssues(new allIssues.IvalidOptionError(optCfg.name, value), issues);
+    const report = combineIssues(new allIssues.InvalidOptionError(optCfg.name, value), issues);
     return {
         report,
         value: isError(report.issue) ? null : resValue
@@ -135,7 +135,7 @@ export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Rec
         data[key] = value;
     }
     const report = {
-        issue: isValid ? null : new allIssues.SomeIvalidOptionsError(),
+        issue: isValid ? null : new allIssues.SomeInvalidOptionsError(),
         children: allReports
     };
     const warnings = Object.keys(dataCopy)

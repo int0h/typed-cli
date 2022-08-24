@@ -35,7 +35,7 @@ export const _match = Symbol('match');
 
 export class CommandBuilder<D extends CliDeclaration> {
     [_decl]: D;
-    [_fn]: CommandHandler<D>;
+    [_fn]!: CommandHandler<D>;
     [_aliases]: string[] = [];
     [_subCommandSet]: CommandSet = {};
 
@@ -146,7 +146,7 @@ export function prepareCommandSet<C extends CommandSet>(cs: C, cfg: CommandHelpe
     const allAliases = getCommandSetAliases(res);
     const aliasCollision = findKeyCollision(allAliases);
     if (aliasCollision) {
-        throw new Error(`alias colision for comand <${aliasCollision}>`);
+        throw new Error(`alias collision for command <${aliasCollision}>`);
     }
     return res;
 }
@@ -233,7 +233,7 @@ export type CommandHelperParams = {
     program?: string;
     /** program description */
     description?: string;
-    /** `true` or completer config if tab complitions wanted */
+    /** `true` or completer config if tab completions wanted */
     completer?: CompleterOptions | boolean;
     /** parse options from environmental variables */
     useEnv?: boolean;
@@ -285,7 +285,7 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
             return;
         }
         if (helpGeneration && argv.includes('--help')) {
-            writer(printer.generateHelpForComands(cfg, cs), 'log');
+            writer(printer.generateHelpForCommands(cfg, cs), 'log');
             exiter(false);
             throw new Error('exiter has failed');
         }
@@ -307,7 +307,7 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
 
 /**
  * Defines a program command
- * @param decl - command declaration, which is basicly the same as program declaration passed to `cli()`
+ * @param decl - command declaration, which is basically the same as program declaration passed to `cli()`
  */
 export function command<D extends CliDeclaration>(decl: D): CommandBuilder<D> {
     return new CommandBuilder(decl);

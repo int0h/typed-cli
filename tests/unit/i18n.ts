@@ -7,14 +7,14 @@ test('declareLocale', t => {
     const l = declareLocale({
         code: 'test',
         issues: {
-            IvalidOptionError: (): string => 'IvalidOptionError',
+            InvalidOptionError: (): string => 'InvalidOptionError',
             EmptyRequiredOptionError: (): string => 'EmptyRequiredOptionError',
-            IvalidInputError: (): string => 'IvalidInputError',
-            SomeIvalidOptionsError: (): string => 'SomeIvalidOptionsError',
+            InvalidInputError: (): string => 'InvalidInputError',
+            SomeInvalidOptionsError: (): string => 'SomeInvalidOptionsError',
             UnknownOptionWarning: (): string => 'UnknownOptionWarning',
             TypeMismatchError: (): string => 'TypeMismatchError',
-            IvalidSomeArguemntsError: (): string => 'IvalidSomeArguemntsError',
-            IvalidArguemntError: (): string => 'IvalidArguemntError',
+            InvalidSomeArgumentsError: (): string => 'InvalidSomeArgumentsError',
+            InvalidArgumentError: (): string => 'InvalidArgumentError',
             TooManyArgumentsError: (): string => 'TooManyArgumentsError',
             InvalidCommand: (): string => 'InvalidCommand',
             NoCommand: (): string => 'NoCommand',
@@ -27,7 +27,7 @@ test('declareLocale', t => {
             hint_commandHint: (): string => 'hint_commandHint',
             opt_required: (): string => 'opt_required',
             opt_optional: (): string => 'opt_optional',
-            opt_multile: (): string => 'opt_multile',
+            opt_multiple: (): string => 'opt_multiple',
         }
     });
 

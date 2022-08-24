@@ -94,17 +94,17 @@ test('invalid options', t => {
     }, {opt1: false, opt2: false, opt3: false}, new Set() as any);
 
     validateReport(report, {
-        issue: [allIssues.SomeIvalidOptionsError, {}],
+        issue: [allIssues.SomeInvalidOptionsError, {}],
         children: [
             {
-                issue: [allIssues.IvalidOptionError, {value: false}],
+                issue: [allIssues.InvalidOptionError, {value: false}],
                 children: [{
                     issue: [allIssues.TypeMismatchError, {expected: 'int', received: 'boolean'}],
                     children: []
                 }]
             },
             {
-                issue: [allIssues.IvalidOptionError, {value: false}],
+                issue: [allIssues.InvalidOptionError, {value: false}],
                 children: [{
                     issue: [allIssues.TypeMismatchError, {expected: 'string', received: 'boolean'}],
                     children: []
@@ -141,7 +141,7 @@ test('custom validator', t => {
 
     const res = handleOption(getOptData(opt), '123');
     validateReport(res.report, {
-        issue: [allIssues.IvalidOptionError, {}], children: [{
+        issue: [allIssues.InvalidOptionError, {}], children: [{
             issue: [Error as any, {message: 'invalid'}], children: []
         }]
     });
@@ -155,7 +155,7 @@ test('empty required option', t => {
 
     const res = handleOption(getOptData(opt), undefined);
     validateReport(res.report, {
-        issue: [allIssues.IvalidOptionError, {}], children: [{
+        issue: [allIssues.InvalidOptionError, {}], children: [{
             issue: [allIssues.EmptyRequiredOptionError, {}], children: []
         }]
     });
@@ -180,7 +180,7 @@ test('invalid array', t => {
     const res = handleOption(getOptData(opt), ['asd', true, false]);
 
     validateReport(res.report, {
-        issue: [allIssues.IvalidOptionError, {}], children: [
+        issue: [allIssues.InvalidOptionError, {}], children: [
             {issue: [allIssues.TypeMismatchError, {}], children: []},
             {issue: [allIssues.TypeMismatchError, {}], children: []}
         ]

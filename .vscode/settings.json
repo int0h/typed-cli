@@ -13,5 +13,6 @@
         "typescriptreact"
     ],
     "coverage-gutters.coverageReportFileName": "coverage/**/index.html",
-    "coverage-gutters.lcovname": "coverage/lcov.info"
+    "coverage-gutters.lcovname": "coverage/lcov.info",
+    "explorer.fileNesting.enabled": true
 }

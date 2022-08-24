@@ -68,7 +68,7 @@ const cmdTextRef = [
 
 test('printer:command genHelp', t => {
     const printer = new Printer({locale: en_US, decorator: plain});
-    const helpText = printer.generateHelpForComands({
+    const helpText = printer.generateHelpForCommands({
         program: 'prog',
         description: 'prog description'
     }, {

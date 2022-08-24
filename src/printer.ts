@@ -8,7 +8,7 @@ import { BaseError, BaseWarning } from './errors';
 import { prepareCliDeclaration } from './parser';
 import { CommandSet, CommandHelperParams, _decl, _subCommandSet } from './command';
 
-function findMinialAlias(opt: Option<any, any, any, any>): string {
+function findMinimalAlias(opt: Option<any, any, any, any>): string {
     return [opt.name, ...getOptData(opt).aliases].sort((a, b) => a.length - b.length)[0];
 }
 
@@ -56,7 +56,7 @@ export class Printer {
 
             // optionality
             if (optData.isArray) {
-                lineParts.push(d.multiple(`[${l.texts.opt_multile(d)}]`));
+                lineParts.push(d.multiple(`[${l.texts.opt_multiple(d)}]`));
             } else if (optData.defaultValue) {
                 lineParts.push(d.optional(`[=${optData.defaultValue}]`));
             } else if (!optData.isRequired) {
@@ -89,14 +89,14 @@ export class Printer {
                 const optionStrings: string[] = [];
 
                 const [boolean, rest] = arrayPartition(opts, (opt) => {
-                    return getOptData(opt).labelName === 'boolean' && findMinialAlias(opt).length === 1;
+                    return getOptData(opt).labelName === 'boolean' && findMinimalAlias(opt).length === 1;
                 });
 
-                const booleanGroup = boolean.map(opt => findMinialAlias(opt)).join('');
+                const booleanGroup = boolean.map(opt => findMinimalAlias(opt)).join('');
                 booleanGroup.length > 0 && optionStrings.push(d.usageOption('-' + booleanGroup));
 
                 rest.forEach(opt => {
-                    const alias = findMinialAlias(opt);
+                    const alias = findMinimalAlias(opt);
                     const prefix = alias.length === 1 ? '-' : '--';
                     const value = getOptData(opt).labelName === 'boolean'
                         ? ''
@@ -131,7 +131,7 @@ export class Printer {
             .join(' ');
     }
 
-    private genenrateCommandList(cs: CommandSet): string[][] {
+    private generateCommandList(cs: CommandSet): string[][] {
         const d = this.decorator;
 
         let res: string[][] = [];
@@ -143,13 +143,13 @@ export class Printer {
             const desc = cmd[_decl].description as string;
             const descText = desc ? ('| - ' + desc) : '|';
             res.push([title, d.commandDescription(descText)]);
-            res = res.concat(this.genenrateCommandList(cmd[_subCommandSet]));
+            res = res.concat(this.generateCommandList(cmd[_subCommandSet]));
         }
 
         return res;
     }
 
-    generateHelpForComands(cfg: CommandHelperParams, cs: CommandSet): string {
+    generateHelpForCommands(cfg: CommandHelperParams, cs: CommandSet): string {
         const d = this.decorator;
         const l = this.locale;
 
@@ -165,7 +165,7 @@ export class Printer {
         textAbstracts.push(
             d.title(l.texts.title_commands(d))
             + '\n' +
-            alignTextMatrix(this.genenrateCommandList(cs), ['right', 'left'])
+            alignTextMatrix(this.generateCommandList(cs), ['right', 'left'])
                 .map(line => line.join(' '))
                 .join('\n')
         );
@@ -200,11 +200,11 @@ export class Printer {
             this.generateUsage(decl as Required<CliDeclaration>)
         );
 
-        const optDecription = this.generateOptionDescription(decl as Required<CliDeclaration>);
-        optDecription && textAbstracts.push(
+        const optDescription = this.generateOptionDescription(decl as Required<CliDeclaration>);
+        optDescription && textAbstracts.push(
             d.title(l.texts.title_options(d))
             + '\n' +
-            optDecription
+            optDescription
         );
 
         return textAbstracts
