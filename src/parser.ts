@@ -1,6 +1,6 @@
 import yargsParser from 'yargs-parser';
 
-import { OptionSet, getOptData, updateOptData } from './option';
+import { OptionSet, getOptData, updateOptData, OptData } from './option';
 import { CliDeclaration, ResolveCliDeclaration } from './type-logic';
 import { handleAllOptions, handleOption } from './pipeline';
 import { createKebabAlias, objMap, uniq } from './utils';
@@ -61,7 +61,7 @@ function optNameToEnvName(optName: string) {
 }
 
 export class Parser<D extends CliDeclaration> {
-    private optCfg: Record<string, any>;
+    private optCfg: Record<string, OptData<unknown>>;
     private decl: D;
     private usedKeys: Set<string>;
     private envPrefix: string;
@@ -79,11 +79,11 @@ export class Parser<D extends CliDeclaration> {
         }
     }
 
-    private parseOptions(parsed: any): {data: any; report: Report} {
-        return handleAllOptions(this.optCfg, extractOptionsFromYargs(parsed), this.usedKeys);
+    private async parseOptions(parsed: any): Promise<{data: any; report: Report}> {
+        return await handleAllOptions(this.optCfg, extractOptionsFromYargs(parsed), this.usedKeys);
     }
 
-    private parseArguments(parsed: any): {data: any; report: Report} {
+    private async parseArguments(parsed: any): Promise<{data: any; report: Report}> {
         if (this.decl._) {
             let parsedArgs = parsed._;
 
@@ -104,7 +104,7 @@ export class Parser<D extends CliDeclaration> {
                 parsedArgs = parsedArgs[0];
             }
 
-            const {value, report} = handleOption(getOptData(this.decl._), parsedArgs);
+            const {value, report} = await handleOption(getOptData(this.decl._), parsedArgs);
             if (isError(report.issue)) {
                 return {
                     data: value,
@@ -143,15 +143,15 @@ export class Parser<D extends CliDeclaration> {
         return res;
     }
 
-    parse(argv: string[] | string, env: Record<string, string | undefined>): {report: Report; data: ResolveCliDeclaration<D> | null} {
+    async parse(argv: string[] | string, env: Record<string, string | undefined>): Promise<{report: Report; data: ResolveCliDeclaration<D> | null}> {
         const parsed = yargsParser(argv, {
             alias: this.decl.options && objMap(this.decl.options, item => getOptData(item).aliases),
             boolean: Object.values(this.decl.options as OptionSet)
                 .filter(opt => getOptData(opt).type === 'boolean')
                 .map(opt => opt.name)
         });
-        const {report: optionsReport, data: optionsData} = this.parseOptions({...this.parseEnv(env), ...parsed});
-        const {report: argumentsReport, data: argumentsData} = this.parseArguments(parsed);
+        const {report: optionsReport, data: optionsData} = await this.parseOptions({...this.parseEnv(env), ...parsed});
+        const {report: argumentsReport, data: argumentsData} = await this.parseArguments(parsed);
         const report = mergeReports(new allIssues.InvalidInputError, optionsReport, argumentsReport);
         if (isError(report.issue)) {
             return {report, data: null};

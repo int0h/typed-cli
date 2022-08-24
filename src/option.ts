@@ -5,9 +5,9 @@ import { Completion } from './completer';
 type TypeMap = {
     number: number;
     int: number;
+    oneOf: string;
     string: string;
     boolean: boolean;
-    any: number | string | boolean;
 }
 
 /** @hidden */
@@ -103,8 +103,8 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
     /** @hidden */
     [optionDataKey]: OptData<RT> = {
         name: '',
-        type: 'any',
-        labelName: 'any',
+        type: 'string',
+        labelName: 'string',
         description: '',
         isRequired: false,
         aliases: [],

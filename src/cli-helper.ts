@@ -28,7 +28,7 @@ export type ArgvProvider = () => string[];
 export type EnvProvider = () => Record<string, string | undefined>;
 
 /** CliHelper - is a function that takes CLI declaration and returns data user inputed */
-export type CliHelper = <D extends CliDeclaration>(decl: D) => ResolveCliDeclaration<D>;
+export type CliHelper = <D extends CliDeclaration>(decl: D) => Promise<ResolveCliDeclaration<D>>;
 
 export type CreateCliHelperParams = {
     writer: Writer;
@@ -46,7 +46,7 @@ export type CreateCliHelperParams = {
  * @param params - helper configuration
  */
 export function createCliHelper(params: CreateCliHelperParams): CliHelper {
-    return <D extends CliDeclaration>(decl: D): ResolveCliDeclaration<D> => {
+    return async <D extends CliDeclaration>(decl: D): Promise<ResolveCliDeclaration<D>> => {
         const {argvProvider, envProvider, exiter, printer, writer, helpGeneration, completer} = params;
         decl = prepareCliDeclaration(decl).decl as any;
         const parser = new Parser(decl);
@@ -66,7 +66,7 @@ export function createCliHelper(params: CreateCliHelperParams): CliHelper {
                 throw new Error('exiter has failed');
             }
         }
-        const {data, report} = parser.parse(argv, envProvider());
+        const {data, report} = await parser.parse(argv, envProvider());
         const printedReport = printer.stringifyReport(report);
         printedReport !== '' && writer(printedReport, 'error');
         if (isError(report.issue)) {

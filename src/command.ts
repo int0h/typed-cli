@@ -181,7 +181,7 @@ export function findMatchedCommand(argv: string[], cs: CommandSet): CommandBuild
     return childMatch || matched;
 }
 
-function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], env: Record<string, string | undefined>, params: ParseCommandSetParams): void {
+async function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], env: Record<string, string | undefined>, params: ParseCommandSetParams): Promise<void> {
     const {onReport, onHelp} = params;
     const handledByChild = parseCommandSet({
         cs: cmd[_subCommandSet],
@@ -198,7 +198,7 @@ function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], env: 
         return;
     }
     const parser = new Parser(cmd[_decl]);
-    const {report, data} = parser.parse(args, env);
+    const {report, data} = await parser.parse(args, env);
     if (report.issue !== null || report.children.length > 0) {
         onReport(report);
     }

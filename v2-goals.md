@@ -1,0 +1,4 @@
+- support interactive mode
+- fix tab completions
+- switch to i0 if needed
+- possibly refactoring

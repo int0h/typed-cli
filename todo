@@ -7,7 +7,7 @@
 + linter
 + cli helper
 + commands
-+ bash complition
++ bash completion
 + enumType
 - remove <any>? it should be a string
 - maximize test coverage
@@ -15,4 +15,4 @@
 ? markdown in descriptions?
 ? descriptions as functions
 ? position arguments
-? option deprication?
+? option deprecation?

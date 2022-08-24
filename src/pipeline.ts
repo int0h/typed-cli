@@ -1,5 +1,7 @@
 import { Report, Issue, combineIssues, isError } from './report';
 import { allIssues } from './errors';
+import inquirer from 'inquirer';
+import { OptData } from './option';
 
 export type Validator<T> = (value: T) => void;
 
@@ -79,15 +81,15 @@ interface OptCfg extends ValidationCfg {
     isArg?: boolean;
 }
 
-function handleArrayOption(optCfg: OptCfg, value: any): {value: any[] | null; report: Report} {
+async function handleArrayOption(optCfg: OptData<unknown>, value: any): Promise<{value: any[] | null; report: Report}> {
     value = ([] as any[]).concat(value);
     let issues: Issue[] = [];
     const resValue: any[] = [];
-    value.forEach((v: any) => {
-        const res = handleOption(optCfg, v, true);
+    for (const v of value) {
+        const res = await handleOption(optCfg, v, true);
         resValue.push(res.value);
         issues = [...issues, ...res.report.children.map(c => c.issue)];
-    });
+    };
     const report = combineIssues(new allIssues.InvalidOptionError(optCfg.name, value), issues);
     return {
         report,
@@ -95,11 +97,36 @@ function handleArrayOption(optCfg: OptCfg, value: any): {value: any[] | null; re
     };
 }
 
-export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {value: any; report: Report} {
+class CliPrompt {
+    async text(msg: string): Promise<string> {
+        const res = await inquirer.prompt([
+            {
+                name: '_',
+                message: msg,
+                type: 'input'
+            }
+        ]);
+        return res._;
+    }
+}
+
+const cliPrompt = new CliPrompt();
+
+async function getOptionInteractively(optCfg: OptData<unknown>): Promise<any> {
+    switch (optCfg.type) {
+        case 'string':
+            return cliPrompt.text(optCfg.name + ':');
+    }
+}
+
+export async function handleOption(optCfg: OptData<unknown>, value: any, iterating?: boolean): Promise<{value: any; report: Report}> {
     if (optCfg.isArray && !iterating) {
         return handleArrayOption(optCfg, value);
     }
     value = runPreprocessors(optCfg.prePreprocessors, value);
+    if (value === undefined) {
+        value = await getOptionInteractively(optCfg);
+    }
     const report = validateOption(optCfg, value);
     if (isError(report.issue)) {
         return {report, value: null};
@@ -118,7 +145,7 @@ export function handleOption(optCfg: OptCfg, value: any, iterating?: boolean): {
     };
 }
 
-export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Record<string, any>, usedKeys: Set<string>): {data: any; report: Report} {
+export async function handleAllOptions(optSchema: Record<string, OptData<unknown>>, rawData: Record<string, any>, usedKeys: Set<string>): Promise<{data: any; report: Report}> {
     const data: any = {};
     const dataCopy = {...rawData};
     let isValid = true;
@@ -127,7 +154,7 @@ export function handleAllOptions(optSchema: Record<string, OptCfg>, rawData: Rec
         const optCfg = optSchema[key];
         const dataValue = dataCopy[key];
         delete dataCopy[key];
-        const {value, report} = handleOption(optCfg, dataValue);
+        const {value, report} = await handleOption(optCfg, dataValue);
         if (isError(report.issue)) {
             isValid = false;
         }

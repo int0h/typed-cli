@@ -40,7 +40,7 @@ export const setupCommands = createCommandHelper({
     helpGeneration: true
 });
 
-export function cli<D extends CliDeclaration>(decl: D): ResolveCliDeclaration<D> {
+export function cli<D extends CliDeclaration>(decl: D): Promise<ResolveCliDeclaration<D>> {
     return cliHelper(decl);
 }
 
