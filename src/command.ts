@@ -183,7 +183,7 @@ export function findMatchedCommand(argv: string[], cs: CommandSet): CommandBuild
 
 async function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[], env: Record<string, string | undefined>, params: ParseCommandSetParams): Promise<void> {
     const {onReport, onHelp} = params;
-    const handledByChild = parseCommandSet({
+    const handledByChild = await parseCommandSet({
         cs: cmd[_subCommandSet],
         argv: args,
         env,
@@ -207,12 +207,12 @@ async function parseCommand(cmd: CommandBuilder<CliDeclaration>, args: string[],
 }
 
 /** @hidden */
-export function parseCommandSet(params: ParseCommandSetParams): boolean {
+export async function parseCommandSet(params: ParseCommandSetParams): Promise<boolean> {
     const {cs, argv, env} = params;
     const [commandName, ...args] = argv;
     for (const cmd of Object.values(cs)) {
         if (cmd[_match](commandName)) {
-            parseCommand(cmd, args, env, params);
+            await parseCommand(cmd, args, env, params);
             return true;
         }
     }
@@ -247,7 +247,7 @@ export type CommandHelperParams = {
  * @param params
  */
 export const createCommandHelper = (params: CreateCommandHelperParams) =>
-    (cfg: CommandHelperParams, cs: CommandSet): void => {
+    async (cfg: CommandHelperParams, cs: CommandSet): Promise<void> => {
         cs = prepareCommandSet(cs, cfg);
         const {writer, exiter, argvProvider, envProvider, printer, helpGeneration} = params;
         const argv = argvProvider();
@@ -280,7 +280,7 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
         const onHelp = (cmd: CommandBuilder<CliDeclaration>): void => {
             writer(printer.generateHelp(cmd[_decl]), 'log');
         }
-        const handled = parseCommandSet({cs, argv, env, onReport, onHelp});
+        const handled = await parseCommandSet({cs, argv, env, onReport, onHelp});
         if (handled) {
             return;
         }
@@ -295,7 +295,7 @@ export const createCommandHelper = (params: CreateCommandHelperParams) =>
         const hasCommand = firstCommand && /^[^-]/.test(firstCommand);
         if (!hasCommand) {
             if (defCmd) {
-                parseCommand(defCmd, argv, env, {cs, argv, env, onReport, onHelp});
+                await parseCommand(defCmd, argv, env, {cs, argv, env, onReport, onHelp});
                 return;
             } else {
                 onReport(errorToReport(new allIssues.NoCommand()));

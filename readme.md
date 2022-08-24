@@ -16,7 +16,7 @@ This project is still alive and maintained. But it is not in active development.
 import {cli, option} from 'typed-cli';
 import app from './app';
 
-const {options} = cli({
+const {options} = await cli({
     options: {
         env: option.oneOf(['dev', 'prod'] as const)
             .alias('e')

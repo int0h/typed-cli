@@ -31,7 +31,7 @@ test('createCliHelper', t => {
         printer
     });
 
-    test('help generation', t => {
+    test('help generation', async t => {
         const helpTextRef = [
             '',
             'Description',
@@ -47,7 +47,7 @@ test('createCliHelper', t => {
         try {
             argv = '--help';
             flush();
-            cli({
+            await cli({
                 name: 'test-cmd',
                 description: 'description',
                 options: {
@@ -62,10 +62,10 @@ test('createCliHelper', t => {
         t.end();
     });
 
-    test('return result', t => {
+    test('return result', async t => {
         argv = '--foo 1'
         flush();
-        const data = cli({
+        const data = await cli({
             name: 'test-cmd',
             description: 'description',
             options: {
@@ -79,7 +79,7 @@ test('createCliHelper', t => {
         t.end();
     });
 
-    test('handle problems', t => {
+    test('handle problems', async t => {
         const helpTextRef = [
             '',
             'option <foo> is invalid',
@@ -89,7 +89,7 @@ test('createCliHelper', t => {
         try {
             argv = '--foo wrong';
             flush();
-            cli({
+            await cli({
                 name: 'test-cmd',
                 description: 'description',
                 options: {
@@ -107,7 +107,7 @@ test('createCliHelper', t => {
     t.end();
 });
 
-test('createCliHelper:noHelpGeneration', t => {
+test('createCliHelper:noHelpGeneration', async t => {
     let exitCode = -1;
     const log = {
         error: '',
@@ -139,7 +139,7 @@ test('createCliHelper:noHelpGeneration', t => {
     try {
         argv = '--help';
         flush();
-        cli({
+        await cli({
             name: 'test-cmd',
             description: 'description',
             options: {

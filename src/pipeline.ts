@@ -1,11 +1,20 @@
 import { Report, Issue, combineIssues, isError } from './report';
 import { allIssues } from './errors';
 import inquirer from 'inquirer';
-import { OptData } from './option';
+import { opt, OptData } from './option';
 
-export type Validator<T> = (value: T) => void;
+export type ValidateCtx = {
+    typeName: string;
+    optionName: string;
+    description: string;
+    isRequired: boolean;
+    isArray: boolean;
+    defaultValue: any;
+}
 
-export type BooleanValidator<T> = (value: T) => boolean;
+export type Validator<T> = (value: T, ctx: ValidateCtx) => void;
+
+export type BooleanValidator<T> = (value: T, ctx: ValidateCtx) => boolean;
 
 export function makeValidator<T>(errorMsg: string, fn: (value: T) => boolean): Validator<T> {
     return (value: any): void => {
@@ -18,22 +27,15 @@ export function makeValidator<T>(errorMsg: string, fn: (value: T) => boolean): V
 
 export type Preprocessor<I = any, O = any> = (value: I) => O;
 
-function runValidator(validator: Validator<any>, value: any): undefined | Error {
+function runValidator(validator: Validator<any>, value: any, ctx: ValidateCtx): undefined | Error {
     try {
-        validator(value);
+        validator(value, ctx);
     } catch(e) {
         return e as any;
     }
 }
 
-interface ValidationCfg {
-    isRequired: boolean;
-    validators: Validator<any>[];
-    name: string;
-    isArg?: boolean;
-}
-
-function validateOption(optCfg: ValidationCfg, value: any): Report {
+function validateOption(optCfg: OptData<any>, value: any): Report {
     const issues: Issue[] = [];
     if (value === undefined) {
         if (optCfg.isRequired) {
@@ -54,7 +56,14 @@ function validateOption(optCfg: ValidationCfg, value: any): Report {
     }
     const validators = optCfg.validators;
     validators.forEach(validator => {
-        const error = runValidator(validator, value);
+        const error = runValidator(validator, value, {
+            defaultValue: optCfg.defaultValue,
+            description: optCfg.description,
+            isArray: optCfg.isArray,
+            isRequired: optCfg.isRequired,
+            optionName: optCfg.name,
+            typeName: optCfg.labelName,
+        });
         if (error) {
             issues.push(error);
         }
@@ -71,14 +80,6 @@ function runPreprocessors(processors: Preprocessor[], value: any): any {
         value = fn(value);
     });
     return value;
-}
-
-interface OptCfg extends ValidationCfg {
-    prePreprocessors: Preprocessor[];
-    postPreprocessors: Preprocessor[];
-    isArray: boolean;
-    defaultValue?: any;
-    isArg?: boolean;
 }
 
 async function handleArrayOption(optCfg: OptData<unknown>, value: any): Promise<{value: any[] | null; report: Report}> {
@@ -125,18 +126,14 @@ export async function handleOption(optCfg: OptData<unknown>, value: any, iterati
     }
     value = runPreprocessors(optCfg.prePreprocessors, value);
     if (value === undefined) {
-        value = await getOptionInteractively(optCfg);
+        if (optCfg.defaultValue !== undefined) {
+            value = optCfg.defaultValue;
+        }
+        // value = await getOptionInteractively(optCfg);
     }
     const report = validateOption(optCfg, value);
     if (isError(report.issue)) {
         return {report, value: null};
-    }
-    if (!optCfg.isRequired && value === undefined) {
-        if (optCfg.defaultValue !== undefined) {
-            value = optCfg.defaultValue;
-        } else {
-            return {report, value};
-        }
     }
     value = runPreprocessors(optCfg.postPreprocessors, value);
     return {

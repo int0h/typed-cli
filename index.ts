@@ -17,5 +17,3 @@ export {Printer} from './src/printer';
 export {defaultArgvProvider, defaultExiter, defaultPrinter, defaultWriter} from './src/default-cli';
 export {decorators, chalkInstance} from './src/decorator';
 export {locales} from './src/i18n';
-import * as presets from './presets';
-export {presets};

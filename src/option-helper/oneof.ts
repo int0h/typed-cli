@@ -1,7 +1,8 @@
-import { option } from '../';
-import { objMap } from '../src/utils';
-import { Option } from '../src/option';
-import { allIssues } from '../src/errors';
+
+import { objMap } from '../utils';
+import { Option } from '../option';
+import { allIssues } from '../errors';
+import {option} from './base-opts';
 
 type OneOfDecl = readonly string[] | {
     [key: string]: any | {
@@ -56,7 +57,7 @@ function normalizeDecl(decl: OneOfDecl): OneOfDeclNorm {
     });
 }
 
-const oneOf = <T extends OneOfDecl>(decl: T): Option<'string', false, false, ResolveOneOfDeclType<T>> => {
+export const oneOf = <T extends OneOfDecl>(decl: T): Option<ResolveOneOfDeclType<T>, false, false> => {
     const normDecl = normalizeDecl(decl);
     const keys = Object.keys(normDecl);
     return option.string
@@ -78,5 +79,3 @@ const oneOf = <T extends OneOfDecl>(decl: T): Option<'string', false, false, Res
             throw new allIssues.TypeMismatchError(keys.map(k => `'${k}'`).join(' | '), value);
         }) as any;
 };
-
-export default oneOf;

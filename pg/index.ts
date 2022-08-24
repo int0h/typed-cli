@@ -1,12 +1,12 @@
 #! /usr/bin/env node
-import {cli, option, presets} from '../';
+import {cli, option} from '../';
 
 async function main() {
     const data = await cli({
         name: 'calc',
         description: 'Calculate expressions',
         options: {
-            operation: presets.oneOf(['+', '-', '*', '/'] as const)
+            operation: option.oneOf(['+', '-', '*', '/'] as const)
                 .alias('o')
                 .required()
                 .description('operation to be applied'),

@@ -3,19 +3,22 @@ import test from 'tape';
 import { getOptData } from '../../src/option';
 import { option } from '../../';
 
+function omit(obj: any, keys: string[]) {
+    const clone = {...obj};
+    keys.forEach(k => delete clone[k]);
+    return clone;
+}
+
 test('option basic', t => {
-    t.deepEqual(getOptData(option.any), {
+    t.deepEqual(omit(getOptData(option.string), ['prePreprocessors', 'postPreprocessors', 'validators']), {
         name: '',
-        type: 'any',
-        labelName: 'any',
+        type: 'string',
+        labelName: 'string',
         description: '',
         isRequired: false,
         aliases: [],
         isArray: false,
         defaultValue: undefined,
-        validators: [],
-        prePreprocessors: [],
-        postPreprocessors: []
     });
     t.end();
 });
@@ -25,7 +28,7 @@ test('option basic', t => {
     const postFn = (): void => {};
     const valFn = (): void => {};
 
-    const opt = option.any
+    const opt = option.number
         .alias('alias1', 'alias2')
         .array()
         .default(123)
@@ -39,24 +42,22 @@ test('option basic', t => {
     const data = getOptData(opt);
     //@ts-ignore
     delete data.postPreprocessors;
-    t.deepEqual(data, {
+    t.deepEqual(omit(data, ['prePreprocessors', 'postPreprocessors', 'validators']), {
         name: '',
-        type: 'any',
+        type: 'number',
         labelName: 'label',
         description: 'description',
         isRequired: true,
         aliases: ['alias1', 'alias2'],
         isArray: true,
         defaultValue: 123,
-        validators: [valFn],
-        prePreprocessors: [preFn],
     });
     t.end();
 });
 
 test('declaration validation', t => {
     t.throws(() => {
-        option.any.process('blah' as any, () => {});
+        option.string.process('blah' as any, () => {});
     });
     t.end();
 });

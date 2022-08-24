@@ -1,7 +1,7 @@
 import yargsParser from 'yargs-parser';
 
-import { OptionSet, getOptData, updateOptData, OptData } from './option';
-import { CliDeclaration, ResolveCliDeclaration } from './type-logic';
+import { getOptData, updateOptData, OptData } from './option';
+import { CliDeclaration, ResolveCliDeclaration, OptionSet } from './type-logic';
 import { handleAllOptions, handleOption } from './pipeline';
 import { createKebabAlias, objMap, uniq } from './utils';
 import { Report, mergeReports, isError } from './report';

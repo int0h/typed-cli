@@ -8,7 +8,7 @@ import { BaseError, BaseWarning } from './errors';
 import { prepareCliDeclaration } from './parser';
 import { CommandSet, CommandHelperParams, _decl, _subCommandSet } from './command';
 
-function findMinimalAlias(opt: Option<any, any, any, any>): string {
+function findMinimalAlias(opt: Option<any, any, any>): string {
     return [opt.name, ...getOptData(opt).aliases].sort((a, b) => a.length - b.length)[0];
 }
 

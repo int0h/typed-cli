@@ -6,7 +6,7 @@ import { locales } from '../../src/i18n';
 import { decorators } from '../../src/decorator';
 import { option } from '../../';
 
-test('command helper result', t => {
+test('command helper result', async t => {
     const handleChild = (): void => {};
     const handleParent = (): void => {};
     const cmd = command({
@@ -24,7 +24,7 @@ test('command helper result', t => {
     t.end();
 });
 
-test('command parsing', t => {
+test('command parsing', async t => {
     let argv: string[] = [];
     let env = {};
     let exitCode = 0;
@@ -47,10 +47,10 @@ test('command parsing', t => {
         writer: (text) => out = text
     });
 
-    test('basics', t => {
+    test('basics', async t => {
         cleanup();
         argv = ['cmd'];
-        commandHelper({}, {
+        await commandHelper({}, {
             cmd: command({}).handle(() => handled = true)
         });
         t.is(handled, true);
@@ -59,38 +59,40 @@ test('command parsing', t => {
         t.end();
     });
 
-    test('no command', t => {
+    test('no command', async t => {
         cleanup();
         argv = [];
-        t.throws(() => {
-            commandHelper({}, {
+        try {
+            await commandHelper({}, {
                 cmd: command({}).handle(() => handled = true)
             });
-        });
+            t.fail();
+        } catch(e) {};
         t.is(handled, false);
         t.is(exitCode, 1);
         t.is(out, 'no command was provided and no default command was set');
         t.end();
     });
 
-    test('no command', t => {
+    test('no command', async t => {
         cleanup();
         argv = ['ads'];
-        t.throws(() => {
-            commandHelper({}, {
+        try {
+            await commandHelper({}, {
                 cmd: command({}).handle(() => handled = true)
             });
-        });
+            t.fail();
+        } catch(e) {}
         t.is(handled, false);
         t.is(exitCode, 1);
         t.is(out, 'command <ads> is not supported');
         t.end();
     });
 
-    test('default cmd', t => {
+    test('default cmd', async t => {
         cleanup();
         argv = [''];
-        commandHelper({}, {
+        await commandHelper({}, {
             [defaultCommand]: command({}).handle(() => handled = true)
         });
         t.is(handled, true);
@@ -99,11 +101,11 @@ test('command parsing', t => {
         t.end();
     });
 
-    test('default cmd', t => {
+    test('default cmd', async t => {
         cleanup();
         argv = ['--help'];
         try {
-            commandHelper({
+            await commandHelper({
                 program: 'prog'
             }, {
                 abc: command({
@@ -129,10 +131,10 @@ test('command parsing', t => {
         t.end();
     });
 
-    test('sub', t => {
+    test('sub', async t => {
         cleanup();
         argv = ['cmd', 'subA'];
-        commandHelper({}, {
+        await commandHelper({}, {
             cmd: command({}).handle(() => {}).subCommands({
                 subA: command({}).handle(() => handled = true)
             })
@@ -143,11 +145,11 @@ test('command parsing', t => {
         t.end();
     });
 
-    test('sub help', t => {
+    test('sub help', async t => {
         cleanup();
         argv = ['cmd', 'subA', '--help'];
         try {
-            commandHelper({
+            await commandHelper({
                 program: 'prog'
             }, {
                 cmd: command({}).handle(() => {}).subCommands({
@@ -173,50 +175,53 @@ test('command parsing', t => {
         t.end();
     });
 
-    test('alias collision', t => {
+    test('alias collision', async t => {
         cleanup();
         argv = ['cmd', 'subA'];
-        t.throws(() => {
-            commandHelper({}, {
+        try {
+            await commandHelper({}, {
                 cmd: command({}).handle(() => {}).subCommands({
                     subA: command({}).handle(() => handled = true)
                 }),
                 cmd2: command({}).handle(() => {}).alias('cmd')
             });
-        });
+            t.fail();
+        } catch(e) {}
         t.is(handled, false);
         t.end();
     });
 
-    test('no command handler', t => {
+    test('no command handler', async t => {
         cleanup();
         argv = ['cmd', 'subA'];
-        t.throws(() => {
-            commandHelper({}, {
+        try {
+            await commandHelper({}, {
                 cmd: command({})
             });
-        });
+            t.fail();
+        } catch(e) {};
         t.is(handled, false);
         t.end();
     });
 
-    test('no default command handler', t => {
+    test('no default command handler', async t => {
         cleanup();
         argv = ['cmd', 'subA'];
-        t.throws(() => {
-            commandHelper({}, {
+        try {
+            await commandHelper({}, {
                 [defaultCommand]: command({})
             });
-        });
+            t.fail();
+        } catch(e) {};
         t.is(handled, false);
         t.end();
     });
 
-    test('sub invalid', t => {
+    test('sub invalid', async t => {
         cleanup();
         argv = ['cmd', 'subA', '-i', 'asd'];
         try {
-            commandHelper({}, {
+            await commandHelper({}, {
                 cmd: command({}).handle(() => {}).subCommands({
                     subA: command({
                         options: {
@@ -226,7 +231,7 @@ test('command parsing', t => {
                 })
             });
         } catch(e) {
-            t.is((e as any).message, 'exiter has failed');
+            t.is((e as any).message, 'exiter has failed'); // does not make sense
         }
         t.is(handled, false);
         t.is(exitCode, 1);
@@ -237,11 +242,11 @@ test('command parsing', t => {
         t.end();
     });
 
-    test('sub warning', t => {
+    test('sub warning', async t => {
         cleanup();
         argv = ['cmd', 'subA', '-r', 'asd'];
         try {
-            commandHelper({}, {
+            await commandHelper({}, {
                 cmd: command({}).handle(() => {}).subCommands({
                     subA: command({
                         options: {
@@ -251,7 +256,7 @@ test('command parsing', t => {
                 })
             });
         } catch(e) {
-            t.is((e as any).message, 'exiter has failed');
+            t.is((e as any).message, 'exiter has failed'); // does not make sense
         }
         t.is(handled, true);
         t.is(exitCode, 0);

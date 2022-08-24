@@ -2,30 +2,30 @@ import { Validator, Preprocessor, makeValidator, BooleanValidator } from './pipe
 import { allIssues } from './errors';
 import { Completion } from './completer';
 
-type TypeMap = {
-    number: number;
-    int: number;
-    oneOf: string;
-    string: string;
-    boolean: boolean;
-}
+// type TypeMap = {
+//     number: number;
+//     int: number;
+//     oneOf: string;
+//     string: string;
+//     boolean: boolean;
+// }
 
-/** @hidden */
-export type Types = keyof TypeMap;
+// /** @hidden */
+// export type Types = keyof TypeMap;
 
-/** @hidden */
-export type ResolveType<T extends Types> = TypeMap[T];
+// /** @hidden */
+// export type ResolveType<T extends Types> = TypeMap[T];
 
-const intrinsicPreProcessors: Partial<Record<Types, Preprocessor>> = {
-    string: s => typeof s === 'number' ? String(s) : s
-}
+// const intrinsicPreProcessors: Partial<Record<Types, Preprocessor>> = {
+//     string: s => typeof s === 'number' ? String(s) : s
+// }
 
-const intrinsicValidators: Partial<Record<Types, BooleanValidator<any>>> = {
-    number: n => n * 1 === n,
-    int: n => Number.isInteger(n),
-    string: s => typeof s === 'string',
-    boolean: b => typeof b === 'boolean'
-}
+// const intrinsicValidators: Partial<Record<Types, BooleanValidator<any>>> = {
+//     number: n => n * 1 === n,
+//     int: n => Number.isInteger(n),
+//     string: s => typeof s === 'string',
+//     boolean: b => typeof b === 'boolean'
+// }
 
 const optionDataKey = Symbol('__data');
 
@@ -34,7 +34,7 @@ type OptionCompleter = (partial: string) => Completion[];
 /** @hidden */
 export type OptData<T> = {
     name: string;
-    type: Types;
+    type: string;
     labelName: string;
     description: string;
     isRequired: boolean;
@@ -49,17 +49,17 @@ export type OptData<T> = {
 };
 
 /** @hidden */
-export function getOptData(opt: Option<any, any, any, any>): OptData<unknown> {
+export function getOptData(opt: Option<any, any, any>): OptData<unknown> {
     return opt[optionDataKey];
 }
 
 /** @hidden */
-export function setOptData(opt: Option<any, any, any, any>, data: OptData<any>): void {
+export function setOptData(opt: Option<any, any, any>, data: OptData<any>): void {
     opt[optionDataKey] = data;
 }
 
 /** @hidden */
-export function cloneOption<O extends Option<any, any, any, any>>(opt: O): O {
+export function cloneOption<O extends Option<any, any, any>>(opt: O): O {
     const oldOpt = opt;
     const oldData = getOptData(oldOpt);
     opt = new Option(oldData.type) as any;
@@ -68,12 +68,12 @@ export function cloneOption<O extends Option<any, any, any, any>>(opt: O): O {
 }
 
 /** @hidden */
-export function updateOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>): O {
+export function updateOptData<O extends Option<any, any, any>>(opt: O, data: Partial<OptData<any>>): O {
     return changeOptData(cloneOption(opt), data);
 }
 
 /** @hidden */
-export function changeOptData<O extends Option<any, any, any, any>>(opt: O, data: Partial<OptData<any>>): O {
+export function changeOptData<O extends Option<any, any, any>>(opt: O, data: Partial<OptData<any>>): O {
     setOptData(opt, {
         ...getOptData(opt),
         ...data
@@ -86,8 +86,8 @@ export function changeOptData<O extends Option<any, any, any, any>>(opt: O, data
  * Defines a new option
  * @param type option data type
  */
-export function opt<T extends Types>(type: T): Option<T, false, false, ResolveType<T>> {
-    return new Option<T, false, false, ResolveType<T>>(type);
+export function opt<T>(type: string): Option<T, false, false> {
+    return new Option<T, false, false>(type);
 }
 
 /**
@@ -97,11 +97,11 @@ export function opt<T extends Types>(type: T): Option<T, false, false, ResolveTy
  * ... .alias().description().default() ...
  * ```
  */
-export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
+export class Option<T, R extends boolean, A extends boolean> {
     /** @hidden */
     name = '';
     /** @hidden */
-    [optionDataKey]: OptData<RT> = {
+    [optionDataKey]: OptData<T> = {
         name: '',
         type: 'string',
         labelName: 'string',
@@ -118,28 +118,9 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
     _isRequired!: R;
     _isArray!: A;
 
-    constructor(type: T) {
-        this[optionDataKey].type = type;
-        this[optionDataKey].labelName = type;
-        const intrinsicValidator = intrinsicValidators[type];
-        if (intrinsicValidator) {
-            changeOptData(this, {
-                validators: [
-                    (value): void => {
-                        if (intrinsicValidator(value)) {
-                            return;
-                        }
-                        throw new allIssues.TypeMismatchError(this[optionDataKey].labelName, typeof value);
-                    }
-                ]
-            });
-        }
-        const intrinsicPreProcessor = intrinsicPreProcessors[type];
-        if (intrinsicPreProcessor) {
-            changeOptData(this, {
-                prePreprocessors: [intrinsicPreProcessor as Preprocessor]
-            })
-        }
+    constructor(typeName: string) {
+        this[optionDataKey].type = typeName;
+        this[optionDataKey].labelName = typeName;
     }
 
     /**
@@ -148,7 +129,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
      * `expected <MyType> but received <string>`
      * @param name - new label for the type
      */
-    label(name: string): Option<T, R, A, RT> {
+    label(name: string): Option<T, R, A> {
         return updateOptData(this, {
             labelName: name
         });
@@ -161,7 +142,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
      * concatenated.
      * @param aliases - alias list
      */
-    alias(...aliases: string[]): Option<T, R, A, RT> {
+    alias(...aliases: string[]): Option<T, R, A> {
         return updateOptData(this, {
             aliases: this[optionDataKey].aliases.concat(aliases)
         });
@@ -174,7 +155,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
      * See 'oneOf' preset source code for usage.
      * @param completer - completer function
      */
-    completer(completer: OptionCompleter): Option<T, R, A, RT> {
+    completer(completer: OptionCompleter): Option<T, R, A> {
         return updateOptData(this, {
             completer
         });
@@ -186,7 +167,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
      * is provided.
      * @param text - description string
      */
-    description(text: string): Option<T, R, A, RT> {
+    description(text: string): Option<T, R, A> {
         return updateOptData(this, {
             description: text
         });
@@ -200,7 +181,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
      * there is no need to check if they are presented i.e.
      * no `options.foo && options.foo.toString()` checks.
      */
-    required(): Option<T, true, A, RT> {
+    required(): Option<T, true, A> {
         return updateOptData(this, {
             isRequired: true
         }) as any;
@@ -214,7 +195,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
      * was presented (or no value at all)
      * i.e. both `[]` and `[1]` are valid results.
      */
-    array(): Option<T, true, true, RT> {
+    array(): Option<T, true, true> {
         return updateOptData(this, {
             isArray: true
         }) as any;
@@ -226,7 +207,7 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
      * Also removes `nullability` from the result type like `required()` does.
      * @param value - default value of the option
      */
-    default(value: RT): Option<T, true, A, RT> {
+    default(value: T): Option<T, true, A> {
         return updateOptData(this, {
             isRequired: false,
             defaultValue: value,
@@ -239,13 +220,13 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
      * @param validator - a validate function that takes a value and return `true` for valid
      * values and `false` otherwise
      */
-    validate(errorMsg: string, validator: BooleanValidator<RT>): Option<T, R, A, RT>;
+    validate(errorMsg: string, validator: BooleanValidator<T>): Option<T, R, A>;
     /**
      * Adds custom validation function.
      * @param validator - a validate function that will throw an error if the provided value is invalid
      */
-    validate(validator: Validator<RT>): Option<T, R, A, RT>;
-    validate(...args: any[]): Option<T, R, A, RT> {
+    validate(validator: Validator<T>): Option<T, R, A>;
+    validate(...args: any[]): Option<T, R, A> {
         const validator = args.length === 2
             ? makeValidator(args[0], args[1])
             : args[0];
@@ -270,9 +251,9 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
      * @param phase - determine whether it will be a **pre**processor or **post** processor
      * @param fn - a processor function
      */
-    process(phase: 'pre', fn: Preprocessor<any, ResolveType<T>>): Option<T, R, A, RT>;
-    process<FR>(phase: 'post', fn: Preprocessor<ResolveType<T>, FR>): Option<T, R, A, FR>;
-    process(phase: 'pre' | 'post', fn: Preprocessor): Option<T, R, A, RT> {
+    process(phase: 'pre', fn: Preprocessor<any, T>): Option<T, R, A>;
+    process<FR>(phase: 'post', fn: Preprocessor<T, FR>): Option<FR, R, A>;
+    process(phase: 'pre' | 'post', fn: Preprocessor): Option<T, R, A> {
         switch (phase) {
             case 'pre':
                 return updateOptData(this, {
@@ -287,5 +268,3 @@ export class Option<T extends Types, R extends boolean, A extends boolean, RT> {
         }
     }
 }
-
-export type OptionSet = Record<string, Option<any, boolean, boolean, any>>;

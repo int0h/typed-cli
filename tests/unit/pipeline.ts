@@ -6,20 +6,20 @@ import { handleAllOptions, handleOption } from '../../src/pipeline';
 import { isError, Report } from '../../src/report';
 import { IssueType, allIssues } from '../../src/errors';
 
-test('handleOption', t => {
+test('handleOption', async t => {
     const opt = option.int
         .process('pre', i => Math.abs(i))
         .validate('option is bad', i => i < 256)
         .process('post', i => i / 256)
         .process('post', i => i * 2 - 1);
 
-    const {value, report} = handleOption(getOptData(opt), 128);
+    const {value, report} = await handleOption(getOptData(opt), 128);
     t.equal(value, 0);
     t.deepEqual(report.children, []);
     t.end();
 });
 
-test('handleAllOptions', t => {
+test('handleAllOptions', async t => {
     const opt1 = option.int
         .process('pre', i => Math.abs(i))
         .validate('option is bad', i => i < 256)
@@ -29,7 +29,7 @@ test('handleAllOptions', t => {
     const opt2 = option.string
         .default('abc');
 
-    const {data} = handleAllOptions({
+    const {data} = await handleAllOptions({
         opt1: getOptData(opt1),
         opt2: getOptData(opt2)
     }, {opt1: 128}, new Set() as any);
@@ -38,7 +38,7 @@ test('handleAllOptions', t => {
     t.end();
 });
 
-test('handleArrayOption', t => {
+test('handleArrayOption', async t => {
     const opt = option.int
         .process('pre', i => Math.abs(i))
         .validate('option is bad', i => i < 256)
@@ -47,7 +47,7 @@ test('handleArrayOption', t => {
         .process('post', i => Math.round(i * 100) / 100)
         .array();
 
-    const {value, report} = handleOption(getOptData(opt), [0, 128, 255]);
+    const {value, report} = await handleOption(getOptData(opt), [0, 128, 255]);
     t.deepEqual(value, [-1, 0, 1]);
     t.deepEqual(report.children, []);
     t.end();
@@ -79,7 +79,7 @@ export function validateReport(r: Report, ref: ReportReference): void {
     ref.children.forEach((ref, i) => validateReport(r.children[i], ref));
 }
 
-test('invalid options', t => {
+test('invalid options', async t => {
     const opt1 = option.int
         .validate('option is bad', i => i < 256)
         .process('post', i => i / 256)
@@ -88,7 +88,7 @@ test('invalid options', t => {
     const opt2 = option.string
         .default('abc');
 
-    const {data, report} = handleAllOptions({
+    const {data, report} = await handleAllOptions({
         opt1: getOptData(opt1),
         opt2: getOptData(opt2)
     }, {opt1: false, opt2: false, opt3: false}, new Set() as any);
@@ -122,24 +122,24 @@ test('invalid options', t => {
     t.end();
 });
 
-test('handle strings containing digits only', t => {
+test('handle strings containing digits only', async t => {
     const opt = option.string;
 
-    const res1 = handleOption(getOptData(opt), '123');
+    const res1 = await handleOption(getOptData(opt), '123');
     t.deepEqual(res1.value, '123');
     t.deepEqual(res1.report.children, []);
 
-    const res2 = handleOption(getOptData(opt), 123);
+    const res2 = await handleOption(getOptData(opt), 123);
     t.deepEqual(res2.value, '123');
     t.deepEqual(res2.report.children, []);
     t.end();
 });
 
-test('custom validator', t => {
+test('custom validator', async t => {
     const opt = option.string
         .validate('invalid', () => false);
 
-    const res = handleOption(getOptData(opt), '123');
+    const res = await handleOption(getOptData(opt), '123');
     validateReport(res.report, {
         issue: [allIssues.InvalidOptionError, {}], children: [{
             issue: [Error as any, {message: 'invalid'}], children: []
@@ -149,11 +149,11 @@ test('custom validator', t => {
     t.end();
 });
 
-test('empty required option', t => {
+test('empty required option', async t => {
     const opt = option.string
         .required();
 
-    const res = handleOption(getOptData(opt), undefined);
+    const res = await handleOption(getOptData(opt), undefined);
     validateReport(res.report, {
         issue: [allIssues.InvalidOptionError, {}], children: [{
             issue: [allIssues.EmptyRequiredOptionError, {}], children: []
@@ -163,10 +163,10 @@ test('empty required option', t => {
     t.end();
 });
 
-test('all empty & all optional', t => {
+test('all empty & all optional', async t => {
     const opt = option.string;
 
-    const res = handleOption(getOptData(opt), undefined);
+    const res = await handleOption(getOptData(opt), undefined);
     t.false(isError(res.report.issue));
 
     t.equal(res.value, undefined);
@@ -174,10 +174,10 @@ test('all empty & all optional', t => {
     t.end();
 });
 
-test('invalid array', t => {
+test('invalid array', async t => {
     const opt = option.string.array();
 
-    const res = handleOption(getOptData(opt), ['asd', true, false]);
+    const res = await handleOption(getOptData(opt), ['asd', true, false]);
 
     validateReport(res.report, {
         issue: [allIssues.InvalidOptionError, {}], children: [

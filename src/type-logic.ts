@@ -1,5 +1,5 @@
 /** @hidden */
-import { Option, OptionSet, Types } from './option';
+import { Option } from './option';
 
 export type GetPropertyNames<T extends Record<string, unknown>, P> = {
     [K in keyof T]: T[K] extends P ? K : never;
@@ -7,14 +7,17 @@ export type GetPropertyNames<T extends Record<string, unknown>, P> = {
 
 export type GetProperties<T extends Record<string, unknown>, P> = Pick<T, GetPropertyNames<T, P>>;
 
-type PickRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, true, boolean, any> | Option<any, boolean, true, any>>;
-type PickNonRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, false, boolean, any>>;
+export type OptionSet = Record<string, Option<any, boolean, boolean>>;
 
-type ResolveOptionType<O extends Option<Types, boolean, boolean, any>> = O extends Option<any, boolean, boolean, infer R>
+
+type PickRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, true, boolean> | Option<any, boolean, true>>;
+type PickNonRequiredOpts<O extends OptionSet> = GetProperties<O, Option<any, false, boolean>>;
+
+type ResolveOptionType<O extends Option<any, boolean, boolean>> = O extends Option<infer R, boolean, boolean>
     ? R
     : never;
 
-type ResolveOption<O extends Option<Types, boolean, boolean, any>> = O extends Option<Types, boolean, true, any>
+type ResolveOption<O extends Option<any, boolean, boolean>> = O extends Option<any, boolean, true>
     ? Array<ResolveOptionType<O>>
     : ResolveOptionType<O>;
 
@@ -30,12 +33,12 @@ export type CliDeclaration = {
     description?: string;
     useEnv?: boolean;
     envPrefix?: string;
-    _?: Option<Types, boolean, boolean, any>;
+    _?: Option<any, boolean, boolean>;
 }
 
 export type ResolveCliDeclaration<D extends CliDeclaration> = {
     options: D['options'] extends OptionSet ? ResolveOptionSet<D['options']> : {};
-    _: D['_'] extends Option<any, infer R, any, any>
+    _: D['_'] extends Option<any, infer R, any>
         ? R extends true
             ? ResolveOption<D['_']>
             : ResolveOption<D['_']> | undefined

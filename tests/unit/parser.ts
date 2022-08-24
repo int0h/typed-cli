@@ -5,7 +5,7 @@ import { validateReport } from './pipeline';
 import { allIssues } from '../../src/errors';
 import { isError } from '../../src/report';
 
-test('every option type', t => {
+test('every option type', async t => {
     const parser = new Parser({
         options: {
             boolean: option.boolean,
@@ -15,7 +15,7 @@ test('every option type', t => {
         }
     });
 
-    const {data, report} = parser.parse('--int 12.23 --number qwe --string', {});
+    const {data, report} = await parser.parse('--int 12.23 --number qwe --string', {});
 
     t.equal(data, null);
 
@@ -37,7 +37,7 @@ test('every option type', t => {
     t.end();
 });
 
-test('parsing valid data', t => {
+test('parsing valid data', async t => {
     const parser = new Parser({
         options: {
             boolean: option.boolean,
@@ -47,7 +47,7 @@ test('parsing valid data', t => {
         }
     });
 
-    const {data, report} = parser.parse('--int 12 --boolean --number 123 --string asd', {});
+    const {data, report} = await parser.parse('--int 12 --boolean --number 123 --string asd', {});
 
     t.equal(report.children.length, 0);
     t.deepEqual(data!.options, {
@@ -60,12 +60,12 @@ test('parsing valid data', t => {
     t.end();
 });
 
-test('parsing Invalid arguments', t => {
+test('parsing Invalid arguments', async t => {
     const parser = new Parser({
         _: option.int
     });
 
-    const {data, report} = parser.parse('asd', {});
+    const {data, report} = await parser.parse('asd', {});
 
     t.equal(data, null);
 
@@ -81,12 +81,12 @@ test('parsing Invalid arguments', t => {
     t.end();
 });
 
-test('empty required argument', t => {
+test('empty required argument', async t => {
     const parser = new Parser({
         _: option.int.required()
     });
 
-    const {data, report} = parser.parse('', {});
+    const {data, report} = await parser.parse('', {});
 
     t.equal(data, null);
 
@@ -106,8 +106,8 @@ test('alias collision detection', t => {
     t.throws(() => {
         new Parser({
             options: {
-                a: option.any,
-                b: option.any.alias('a')
+                a: option.string,
+                b: option.string.alias('a')
             }
         });
     });
@@ -115,8 +115,8 @@ test('alias collision detection', t => {
     t.throws(() => {
         new Parser({
             options: {
-                someVar: option.any,
-                'some-var': option.any
+                someVar: option.string,
+                'some-var': option.string
             }
         });
     }, 'kebab alias collision check');
@@ -124,12 +124,12 @@ test('alias collision detection', t => {
     t.end();
 });
 
-test('passing array for non-array option', t => {
+test('passing array for non-array option', async t => {
     const parser = new Parser({
         _: option.int.required()
     });
 
-    const {data, report} = parser.parse('1 2 3', {});
+    const {data, report} = await parser.parse('1 2 3', {});
 
     t.equal(data, null);
 
@@ -143,12 +143,12 @@ test('passing array for non-array option', t => {
     t.end();
 });
 
-test('parsing valid array of arguments', t => {
+test('parsing valid array of arguments', async t => {
     const parser = new Parser({
         _: option.int.array()
     });
 
-    const {data, report} = parser.parse('1 2 3', {});
+    const {data, report} = await parser.parse('1 2 3', {});
 
     t.deepEqual(data!._, [1, 2, 3]);
 
@@ -157,12 +157,12 @@ test('parsing valid array of arguments', t => {
     t.end();
 });
 
-test('parsing one valid arguments', t => {
+test('parsing one valid arguments', async t => {
     const parser = new Parser({
         _: option.int
     });
 
-    const {data, report} = parser.parse('1', {});
+    const {data, report} = await parser.parse('1', {});
 
     t.deepEqual(data!._, 1);
 
@@ -171,12 +171,12 @@ test('parsing one valid arguments', t => {
     t.end();
 });
 
-test('parsing one argument when multiple supported', t => {
+test('parsing one argument when multiple supported', async t => {
     const parser = new Parser({
         _: option.int.array()
     });
 
-    const {data, report} = parser.parse('1', {});
+    const {data, report} = await parser.parse('1', {});
 
     t.deepEqual(data!._ as number[], [1]);
 
@@ -185,7 +185,7 @@ test('parsing one argument when multiple supported', t => {
     t.end();
 });
 
-test('parsing from ENV', t => {
+test('parsing from ENV', async t => {
     const parser = new Parser({
         useEnv: true,
         options: {
@@ -193,7 +193,7 @@ test('parsing from ENV', t => {
         }
     });
 
-    const {data, report} = parser.parse('', {FOO: '1'});
+    const {data, report} = await parser.parse('', {FOO: '1'});
 
     t.deepEqual(data?.options.foo as number[], [1]);
 
@@ -202,7 +202,7 @@ test('parsing from ENV', t => {
     t.end();
 });
 
-test('parsing from ENV: mutli-word', t => {
+test('parsing from ENV: multi-word', async t => {
     const parser = new Parser({
         useEnv: true,
         options: {
@@ -210,7 +210,7 @@ test('parsing from ENV: mutli-word', t => {
         }
     });
 
-    const {data, report} = parser.parse('', {ENV_OPT: '1'});
+    const {data, report} = await parser.parse('', {ENV_OPT: '1'});
 
     t.deepEqual(data?.options.envOpt as number[], [1]);
 
@@ -219,7 +219,7 @@ test('parsing from ENV: mutli-word', t => {
     t.end();
 });
 
-test('parsing from ENV: name as prefix by default', t => {
+test('parsing from ENV: name as prefix by default', async t => {
     const parser = new Parser({
         useEnv: true,
         name: 'program',
@@ -228,7 +228,7 @@ test('parsing from ENV: name as prefix by default', t => {
         }
     });
 
-    const {data, report} = parser.parse('', {PROGRAM_ENV_OPT: '1'});
+    const {data, report} = await parser.parse('', {PROGRAM_ENV_OPT: '1'});
 
     t.deepEqual(data?.options.envOpt as number[], [1]);
 

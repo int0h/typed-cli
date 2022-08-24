@@ -4,7 +4,6 @@ import {normalizeCompleterOptions, completeForCliDecl, completeForCommandSet} fr
 import { CliDeclaration } from '../../src/type-logic';
 import { option } from '../../';
 import { prepareCliDeclaration } from '../../src/parser';
-import { oneOf } from '../../presets';
 import { CommandSet, command, prepareCommandSet } from '../../src/command';
 
 test('normalizeCompleterOptions', t => {
@@ -27,7 +26,7 @@ test('completeForCliDecl', t => {
         options: {
             n: option.int.description('foo').array(),
             someProp: option.string.alias('some-opt-alias').description('bar'),
-            en: oneOf(['a', 'b']).description('enum'),
+            en: option.oneOf(['a', 'b']).description('enum'),
             bool: option.boolean.description('bool')
         }
     };

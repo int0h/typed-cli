@@ -12,7 +12,7 @@ const helpTextRef =
 description
 
 Usage
-    test-cmd -w --required <int> [-bz --bigBoolean -i <int> -n <number> -s <string> --array <int> --default <any> --desc <any>] [<number>]
+    test-cmd -w --required <int> [-bz --bigBoolean -i <int> -n <number> -s <string> --array <int> --default <number> --desc <string>] [<number>]
 
 Options
     -b, --boolean                <boolean>  [optional]  -
@@ -24,8 +24,8 @@ Options
     -s, --string                 <string>   [optional]  -
     --array                      <int>      [multiple]  -
     --required                   <int>      [required]  -
-    --default                    <any>      [=123]      -
-    --desc                       <any>      [optional]  - option desc`;
+    --default                    <number>   [=123]      -
+    --desc                       <string>   [optional]  - option desc`;
 
 test('printer:genHelp', t => {
     const printer = new Printer({locale: en_US, decorator: plain});
@@ -43,9 +43,9 @@ test('printer:genHelp', t => {
 
             array: option.int.array(),
             required: option.int.required(),
-            default: option.any.default(123),
+            default: option.number.default(123),
 
-            desc: option.any.description('option desc')
+            desc: option.string.description('option desc')
         },
         _: option.number
     });
@@ -181,7 +181,7 @@ option <stringOpt> is invalid
     - expected <string>, but received <boolean>
 option <invalid> is not supported`;
 
-test('printer:stringifyReport:basic types', t => {
+test('printer:stringifyReport:basic types', async t => {
     const printer = new Printer({locale: en_US, decorator: plain});
 
     const parser = new Parser({
@@ -202,7 +202,7 @@ test('printer:stringifyReport:basic types', t => {
         }
     });
 
-    const {data, report} = parser.parse([
+    const {data, report} = await parser.parse([
         '--intOpt', '12.23',
         '--numberOpt', 'qwe',
         '--stringOpt',
@@ -220,7 +220,7 @@ test('printer:stringifyReport:basic types', t => {
     t.end();
 });
 
-test('printer:stringifyReport:valid report', t => {
+test('printer:stringifyReport:valid report', async t => {
     const printer = new Printer({locale: en_US, decorator: plain});
 
     const parser = new Parser({
@@ -229,7 +229,7 @@ test('printer:stringifyReport:valid report', t => {
         }
     });
 
-    const {report} = parser.parse([
+    const {report} = await parser.parse([
         '--booleanOpt'
     ], {});
 
